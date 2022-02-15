@@ -1,0 +1,21 @@
+{
+  "name": "",
+  "version": "",
+  "description": "",
+  "scripts": {
+    "test": "standard --fix && jest"
+  },
+  "author": "",
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "jest": "^27.5.1",
+    "msw": "^0.36.8",
+    "standard": "^16.0.4"
+  },
+  "standard": {
+    "ignore": [
+      "tests/*",
+      "mocks/*"
+    ]
+  }
+}
