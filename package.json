@@ -3,12 +3,14 @@
   "version": "",
   "description": "",
   "scripts": {
+    "dev": "cross-env NODE_ENV=development func start",
     "test": "standard --fix && jest"
   },
   "author": "",
   "devDependencies": {
     "@azure/identity-vscode": "^1.0.0",
     "@types/jest": "^27.4.0",
+    "cross-env": "^7.0.3",
     "jest": "^27.5.1",
     "msw": "^0.36.8",
     "standard": "^16.0.4",
@@ -22,7 +24,8 @@
   },
   "dependencies": {
     "@azure/identity": "^2.0.2",
-    "@vtfk/responsehandlers": "^1.0.4",
-    "axios": "^0.26.0"
+    "@vtfk/responsehandlers": "^1.0.9",
+    "axios": "^0.26.0",
+    "dotenv": "^16.0.0"
   }
 }

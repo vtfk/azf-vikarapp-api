@@ -30,7 +30,8 @@ describe('Test GetTeachers endpoint', () => {
 
     const response = await GetTeachers(null, request);
 
-    expect(response.length).toBeGreaterThan(0);
-    expect(response[0].displayName).toBeTruthy();
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+    expect(response.body[0].displayName).toBeTruthy();
   })
 })

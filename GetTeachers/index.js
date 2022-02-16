@@ -4,8 +4,17 @@ const { default: axios } = require('axios')
 
 module.exports = async function (context, req) {
   try {
+    /*
+      Input validation
+    */
     if (!req.params.upn) throw new Error('No UPN was provided')
 
+    // Setup mock if applicable
+    require('../mocks/setupMock')()
+
+    /*
+      Make request
+    */
     const request = {
       url: `https://graph.microsoft.com/v1.0/users/${req.params.upn}/ownedObjects`,
       metod: 'get',
@@ -16,6 +25,9 @@ module.exports = async function (context, req) {
 
     const response = await axios.request(request)
 
+    /*
+      Send response
+    */
     let data
     if (response?.data?.value) data = response?.data?.value
     else data = []
