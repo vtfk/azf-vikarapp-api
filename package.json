@@ -7,15 +7,22 @@
   },
   "author": "",
   "devDependencies": {
+    "@azure/identity-vscode": "^1.0.0",
     "@types/jest": "^27.4.0",
     "jest": "^27.5.1",
     "msw": "^0.36.8",
-    "standard": "^16.0.4"
+    "standard": "^16.0.4",
+    "stub-azure-function-context": "^2.0.0-alpha.6"
   },
   "standard": {
     "ignore": [
       "tests/*",
       "mocks/*"
     ]
+  },
+  "dependencies": {
+    "@azure/identity": "^2.0.2",
+    "@vtfk/responsehandlers": "^1.0.4",
+    "axios": "^0.26.0"
   }
 }
