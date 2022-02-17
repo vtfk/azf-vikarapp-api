@@ -6,10 +6,6 @@
   },
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "AzureWebJobsStorage": "",
-    "AZURE_CLIENT_ID": "e4ecefc1-524f-4be8-9ac7-dbd23902b533",
-    "AZURE_TENANT_ID": "08f3813c-9f29-482f-9aec-16ef7cbf477a",
-    "AZURE_CLIENT_SECRET": "Dfv7Q~RqqEynJtD9eEFYfwVV_b.CI1IJc5uzj",
-    "AZURE_CLIENT_SECRET_ID": "a425f7fb-1492-4592-9d9a-39847fcd3e34"
+    "AzureWebJobsStorage": ""
   }
 }

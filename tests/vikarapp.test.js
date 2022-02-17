@@ -7,7 +7,7 @@ const { server } = require('../mocks/server');
 /*
   Import routes
 */
-const GetTeachers = require('../GetTeachers');
+const getTeacherTeams = require('../GetTeacherTeams');
 
 /*
   Setup
@@ -28,7 +28,7 @@ describe('Test GetTeachers endpoint', () => {
       params: { upn: 'noen.andre@vtfk.no' }
     }
 
-    const response = await GetTeachers(null, request);
+    const response = await getTeacherTeams(null, request);
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
