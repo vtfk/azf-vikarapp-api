@@ -1,3 +1,4 @@
+const config = require('../config')
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const { prepareRequest } = require('../lib/_helpers')
 const { callMSGraph } = require('../lib/msgraph');
@@ -9,15 +10,16 @@ module.exports = async function (context, req) {
   try {
     // Prepare the request
     const required = ['params.searchTerm'];
-    const { token } = await prepareRequest(req, { required } )
+    await prepareRequest(req, { required } )
 
     const term = req.params.searchTerm;
 
     /*
       Make request
     */
+    const url = `https://graph.microsoft.com/v1.0/groups/${config.searchGroupId}/members?$search="displayName:${term}"`
     const request = {
-      url: `https://graph.microsoft.com/v1.0/users?$filter=startsWith(displayName,'${term}') OR startsWith(surname,'${term}')&$orderby=displayName&$count=true`,
+      url: url,
       metod: 'get',
       headers: {
         ConsistencyLevel: 'eventual'

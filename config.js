@@ -12,6 +12,7 @@ else require('dotenv').config()
 */
 module.exports = {
   USE_MOCK: process.env.USE_MOCK || false,
+  searchGroupId: process.env.AZURE_SEARCH_GROUP_ID,
   azureApplication: {
     tenantId: process.env.AZURE_APP_TENANT_ID,
     clientId: process.env.AZURE_APP_ID,
