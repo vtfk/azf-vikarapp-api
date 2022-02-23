@@ -28,12 +28,14 @@ module.exports = async function (context, req) {
 
     const response = await callMSGraph(request);
 
-    /*
-      Send response
-    */
+    // Prepare the data
     let data
     if (response?.value) data = response?.value
     else data = []
+
+    /*
+      Send response
+    */
     return await azfHandleResponse(data, context, req)
   } catch (err) {
     return await azfHandleError(err, context, req)

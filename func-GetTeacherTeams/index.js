@@ -27,6 +27,9 @@ module.exports = async function (context, req) {
     if (response?.value) data = response?.value
     else data = []
 
+    // Remove every item that is not a SDS team
+    data = data.filter((i) => i.mail && i.mail.toLowerCase().startsWith('section_'))
+
     // Send the response
     return await azfHandleResponse(data, context, req)
   } catch (err) {
