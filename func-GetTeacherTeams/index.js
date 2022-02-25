@@ -8,7 +8,7 @@ const { callMSGraph } = require('../lib/msgraph')
 module.exports = async function (context, req) {
   try {
     // Prepare the request
-    const required = ['upn'];
+    const required = ['params.upn'];
     await prepareRequest(req, { required } )
 
     // Make the request
