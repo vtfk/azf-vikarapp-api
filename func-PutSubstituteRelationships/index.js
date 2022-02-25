@@ -12,6 +12,11 @@ module.exports = async function (context, req) {
     // Connect to dabase
     await db.connect();
 
+    // Normalize data
+    if(req.body.permittedSchools?.includes('*')) {
+      if(req.body.permittedSchools.length > 0) req.body.permittedSchools = ['*']
+    }
+
     // Get all substitupe relationships
     const data = await db.SubstituteRelationships.findByIdAndUpdate(req.params.id, req.body)
 
