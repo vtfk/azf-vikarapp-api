@@ -39,8 +39,6 @@ module.exports = async function (context, req) {
     // Get any existing substitutions
     const existingSubstitutions = await db.Substitutions.find({ substituteId: substitute.id})
 
-    // The documents that will be returned
-    let documents = [];
     // Any new substitutions discovered below
     const newSubstitutions = [];
     // Any substitutions that should be renewed
@@ -100,20 +98,22 @@ module.exports = async function (context, req) {
           })
         }
       }
-
-      if(newSubstitutions.length > 0) {
-        const result = await db.Substitutions.create(newSubstitutions)
-        documents = [...result]
-      }
-      for(const renewal of renewedSubstitutions) {
-        const result = await db.Substitutions.findByIdAndUpdate(renewal._id, renewal, { new: true })
-        documents = [...documents, result]
-      }
-
-      console.log('New substitutions:', newSubstitutions)
-      console.log('Renewed substitutions:', renewedSubstitutions)
-
     }
+
+    // Make requests to the database
+    let documents = []; // The documents that will be returned
+    if(newSubstitutions.length > 0) {
+      const result = await db.Substitutions.create(newSubstitutions)
+      documents = [...result]
+    }
+    for(const renewal of renewedSubstitutions) {
+      const result = await db.Substitutions.findByIdAndUpdate(renewal._id, renewal, { new: true })
+      documents = [...documents, result]
+    }
+
+    console.log('New substitutions:', newSubstitutions)
+    console.log('Renewed substitutions:', renewedSubstitutions)
+
     // Send the response
     return await azfHandleResponse(documents, context, req)
   } catch (err) {
