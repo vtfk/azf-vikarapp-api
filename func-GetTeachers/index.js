@@ -4,7 +4,7 @@ const { prepareRequest } = require('../lib/_helpers')
 const { callMSGraph } = require('../lib/msgraph');
 // const { DefaultAzureCredential, VisualStudioCodeCredential, AzureCliCredential, useIdentityPlugin } = require('@azure/identity')
 const { default: axios } = require('axios')
-const { connect, SubstituteRelationships } = require('../lib/db');
+const { connect, Schools: SubstituteRelationships } = require('../lib/db');
 
 
 module.exports = async function (context, req) {
@@ -17,15 +17,21 @@ module.exports = async function (context, req) {
     const term = req.params.searchTerm;
 
     // Check if we need to filter out some results
-    let allowedLocations = undefined;
+    let allowedLocations = [];
     if((!requestor.roles || !requestor.roles.includes('App.Admin') && requestor.officeLocation)) {
       await connect();
-      const relationship = await SubstituteRelationships.findOne({ name: requestor.officeLocation })
-      if(relationship?.permittedSchools) allowedLocations = relationship.permittedSchools
-      // Add the owners own location to the allowed array if not already present
-      if(!allowedLocations.includes(requestor.officeLocation)) allowedLocations.push(requestor.officeLocation)
+      const relationship = await SubstituteRelationships.findOne({ name: requestor.officeLocation }).populate('permittedSchools', '_id name').lean()
+      console.log('School', relationship)
+      if(relationship) {
+        if(relationship?.permittedSchools) allowedLocations = relationship.permittedSchools
+        // Add the owners own location to the allowed array if not already present
+        if(!allowedLocations.includes(requestor.officeLocation)) {
+          const match = relationship.permittedSchools.find((i) => i.name === requestor.officeLocation)
+          if(!match) allowedLocations.push({ _id: relationship._id, name: relationship.name})
+        }
+      }
     }
-
+    console.log('Allowed Locations', allowedLocations)
     /*
       Make request
     */
@@ -46,8 +52,9 @@ module.exports = async function (context, req) {
     else data = []
 
     // Determine of any of the search results should be filtered out
-    if(Array.isArray(allowedLocations) && !allowedLocations.includes('*')) {
-      data = data.filter((entry) => allowedLocations.includes(entry.officeLocation))
+    if(Array.isArray(allowedLocations) && allowedLocations.length > 0) {
+      const allowedNames = allowedLocations.map((i) => i.name)
+      data = data.filter((entry) => allowedNames.includes(entry.officeLocation))
     }
 
     /*

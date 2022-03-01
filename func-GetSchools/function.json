@@ -8,7 +8,7 @@
       "methods": [
         "get"
       ],
-      "route": "substituterelationships"
+      "route": "schools"
     },
     {
       "type": "http",

@@ -12,13 +12,8 @@ module.exports = async function (context, req) {
     // Connect to dabase
     await db.connect();
 
-    // Normalize data
-    if(req.body.permittedSchools?.includes('*')) {
-      if(req.body.permittedSchools.length > 0) req.body.permittedSchools = ['*']
-    }
-
     // Get all substitupe relationships
-    const data = await db.SubstituteRelationships.findByIdAndUpdate(req.params.id, req.body)
+    const data = await db.Schools.findByIdAndUpdate(req.params.id, req.body)
 
     // Send the response
     return await azfHandleResponse(data, context, req)
