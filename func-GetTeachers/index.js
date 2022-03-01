@@ -21,7 +21,7 @@ module.exports = async function (context, req) {
     if((!requestor.roles || !requestor.roles.includes('App.Admin') && requestor.officeLocation)) {
       await connect();
       const relationship = await SubstituteRelationships.findOne({ name: requestor.officeLocation }).populate('permittedSchools', '_id name').lean()
-      console.log('School', relationship)
+
       if(relationship) {
         if(relationship?.permittedSchools) allowedLocations = relationship.permittedSchools
         // Add the owners own location to the allowed array if not already present
@@ -31,7 +31,7 @@ module.exports = async function (context, req) {
         }
       }
     }
-    console.log('Allowed Locations', allowedLocations)
+
     /*
       Make request
     */
