@@ -15,7 +15,12 @@ module.exports = async function (context, req) {
   try {
     // Prepare the request
     const required = ['body.substituteUpn', 'body.substitutions']
-    await prepareRequest(req, { required })
+    const { requestor } = await prepareRequest(req, { required })
+
+    // If the requestor is not admin and the requestor and the substitute is not the same, then this request is not allowed
+    if(!requestor.roles.includes('App.Admin') && requestor.upn !== req.body.substituteUpn) {
+      throw new Error('Du har ikke rettigheter til å legge inn vikariat for andre enn deg selv')
+    }
 
     // Calculate when the next expirationTimestamp should be set
     var expirationTimestamp = new Date(new Date().setHours(1,0,0,0) + (2 * 24 * 60 * 60 * 1000))
@@ -46,6 +51,7 @@ module.exports = async function (context, req) {
     for(const teacherUpn in groupedRequests) {
       // Validation
       if(!teacherUpn || teacherUpn === 'undefined') throw new Error(`Vikariater kan ikke settes opp fordi en eller flere lærer ikke finnes`)
+      if(teacherUpn === req.body.substituteUpn) throw new Error(`Vikaren kan ikke være vikar for seg selv`)
       const teacherRequestGroup = groupedRequests[teacherUpn];
       if(teacherRequestGroup.length === 0) throw new Error(`Vikariater kan ikke settes opp fordi teams for lærer ${teacherUpn} ikke kunne finnes`)
       let teamsIds = []
