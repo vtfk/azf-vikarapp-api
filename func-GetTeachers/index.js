@@ -32,10 +32,16 @@ module.exports = async function (context, req) {
       }
     }
 
+    // Check if the requestor can return it self
+    let exludeSelfFilter = ''
+    if(!req.query.returnSelf) exludeSelfFilter = `$filter=userPrincipalName ne '${requestor.upn}'&`
+
+    console.log('Params', req.query)
+
     /*
       Make request
     */
-    const url = `https://graph.microsoft.com/v1.0/groups/${config.searchGroupId}/members?$filter=userPrincipalName ne '${requestor.upn}'&$search="displayName:${term}"`
+    const url = `https://graph.microsoft.com/v1.0/groups/${config.searchGroupId}/members?${exludeSelfFilter}$search="displayName:${term}"`
     const request = {
       url: url,
       metod: 'get',
