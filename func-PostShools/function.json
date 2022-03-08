@@ -6,9 +6,9 @@
       "direction": "in",
       "name": "req",
       "methods": [
-        "put"
+        "post"
       ],
-      "route": "substituterelationships/{id}"
+      "route": "schools"
     },
     {
       "type": "http",
