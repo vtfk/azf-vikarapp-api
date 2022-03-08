@@ -4,105 +4,105 @@ const db = require('../lib/db')
 const { prepareRequest } = require('../lib/_helpers')
 const { callMSGraph } = require('../lib/msgraph')
 
-var groupBy = function(xs, key) {
-  return xs.reduce(function(rv, x) {
-    (rv[x[key]] = rv[x[key]] || []).push(x);
-    return rv;
-  }, {});
-};
-
 module.exports = async function (context, req) {
   try {
     // Prepare the request
-    const required = ['body.substituteUpn', 'body.substitutions']
-    const { requestor } = await prepareRequest(req, { required })
+    const { requestor } = await prepareRequest(req)
+    if(!req.body || !Array.isArray(req.body)) throw new Error('Forespørselen er feil formatert')
 
-    // If the requestor is not admin and the requestor and the substitute is not the same, then this request is not allowed
-    if(!requestor.roles.includes('App.Admin') && requestor.upn !== req.body.substituteUpn) {
-      throw new Error('Du har ikke rettigheter til å legge inn vikariat for andre enn deg selv')
+    // Make sure that all the requests are correctly formatted
+    for(const substitution of req.body) {
+      // The requestor can only setup substitutions for a another teacher if he/she is admin
+      if(!requestor.roles.includes('App.Admin') && requestor.upn !== substitution.substituteUpn) {
+        throw new Error('Du har ikke rettigheter til å legge inn vikariat for andre enn deg selv')
+      }
+
+      if(!substitution.substituteUpn) throw new Error(`En eller flere vikariatforespørsler mangler 'substituteUpn'`)
+      if(!substitution.substituteUpn.includes('@')) throw new Error(`${substitution.substituteUpn} er ikke ett gyldig upn`)
+      if(!substitution.teacherUpn) throw new Error(`En eller flere vikariatforespørsler mangler 'teacherUpn'`)
+      if(!substitution.teacherUpn.includes('@')) throw new Error(`${substitution.teacherUpn} er ikke ett gyldig upn`)
+      if(!substitution.teamId) throw new Error(`En eller flere vikariatforespørsler mangler 'teamId'`)
     }
-
-    // Calculate when the next expirationTimestamp should be set
-    var expirationTimestamp = new Date(new Date().setHours(1,0,0,0) + (2 * 24 * 60 * 60 * 1000))
-
-    // Validation
-    if(!Array.isArray(req.body.substitutions) || req.body.substitutions.length === 0) throw new Error(`req.body må være ett array`)
-
-    // Make sure that the substitute exists
-    const substitute = await callMSGraph({
-      url: `https://graph.microsoft.com/v1.0/users/${req.body.substituteUpn}`
-    })
-    if(!substitute) throw new Error(`Kunne ikke finne vikarlærer ${req.body.substituteUpn}`)
-
-    // Group the request by teacherUpn
-    const groupedRequests = groupBy(req.body.substitutions, 'teacherUpn')
-    if(groupedRequests.length === 0) return await azfHandleResponse([], context, req)
-
+    
     // Connect the database
     await db.connect();
 
-    // Get any existing substitutions
-    const existingSubstitutions = await db.Substitutions.find({ substituteId: substitute.id})
+    // Get all unique substitute and teacher UPNS
+    const uniqueSubstituteUpns = [... new Set(req.body.map((i) => i.substituteUpn))]
+    const uniqueTeacherUpns = [... new Set(req.body.map((i) => i.teacherUpn))]
 
-    // Any new substitutions discovered below
-    const newSubstitutions = [];
-    // Any substitutions that should be renewed
-    const renewedSubstitutions = [];
-    for(const teacherUpn in groupedRequests) {
-      // Validation
-      if(!teacherUpn || teacherUpn === 'undefined') throw new Error(`Vikariater kan ikke settes opp fordi en eller flere lærer ikke finnes`)
-      if(teacherUpn === req.body.substituteUpn) throw new Error(`Vikaren kan ikke være vikar for seg selv`)
-      const teacherRequestGroup = groupedRequests[teacherUpn];
-      if(teacherRequestGroup.length === 0) throw new Error(`Vikariater kan ikke settes opp fordi teams for lærer ${teacherUpn} ikke kunne finnes`)
-      let teamsIds = []
-      teacherRequestGroup.forEach((i) => {
-        if(!i.teamId || typeof i.teamId !== 'string') throw new Error(`TeamsId '${i.teamId}' er feil formatert`)
-        teamsIds.push(i.teamId)
+    // Retreive all required substitute information from MS Graph
+    const substitutes = [];
+    for(const upn of uniqueSubstituteUpns) {
+      // Get the substitute from MS graph
+      const substitute = await callMSGraph({
+        url: `https://graph.microsoft.com/v1.0/users/${upn}`
       })
+      if(!substitute) throw new Error(`Kunne ikke finne vikarlærer '${upn}'`)
 
-      // Make sure that the teacher exists
+      // Attempt to find existing substituions in the database
+      const existingSubstitutions = await db.Substitutions.find({ substituteId: substitute.id})
+      if(existingSubstitutions) substitute.substitutions = existingSubstitutions;
+
+      substitutes.push(substitute)
+    }
+
+    // Retreive all required teacher information from MS Graph
+    const teachers = [];
+    for(const upn of uniqueTeacherUpns) {
+      // Retreive the teacher information
       const teacher = await callMSGraph({
-        url: `https://graph.microsoft.com/v1.0/users/${teacherUpn}`
+        url: `https://graph.microsoft.com/v1.0/users/${upn}`
       })
-      if(!teacher) throw new Error(`Kunne ikke finne lærer ${teacherUpn}`)
-      
-      // Make sure that the teacher owns all the teams Ids and that they are SDS-teams
-      let teacherOwnedResources = await callMSGraph({
-        url: `https://graph.microsoft.com/v1.0/users/${teacherUpn}/ownedObjects?$select=id,displayName,mail`
-      })
-      if(!teacherOwnedResources) throw new Error(`Kunne ikke hente ut hva ${teacherUpn} eier`)
-      if(teacherOwnedResources.value) teacherOwnedResources = teacherOwnedResources.value
-      
-      // ForEach requested team
-      for(const id of teamsIds) {
-        const match = teacherOwnedResources.find((owned) => owned.id === id);
-        if(!match) throw new Error(`Kan ikke sette opp vikariat fordi læreren ikke eier team ${id}`)
-        if(!match['@odata.type'] || match['@odata.type'] !== '#microsoft.graph.group') throw new Error(`Kan ikke sette opp vikariat fordi ressurs ${id} ikke er en gruppe`)
-        if(!match.mail || !match.mail.toLowerCase().startsWith('section_')) throw new Error(`Kan ikke sette opp vikariat fordi ressurs ${id} ikke er ett skole team`)
+      if(!teacher || !teacher.id) throw new Error(`Kunne ikke finne lærer '${upn}'`)
 
-        // Attempt to find an existing substitution
-        const existing = existingSubstitutions.find((sub) => sub.teamId === id && sub.status !== 'expired');
-        
-        // If existing, create a renewal if not create a new document
-        if(existing && existing._id) {
-          renewedSubstitutions.push({
-            _id: existing._id,
-            expirationTimestamp: expirationTimestamp
-          })
-        } else {
-          newSubstitutions.push({
-            status: 'pending',
-            teacherId: teacher.id,
-            teacherName: teacher.displayName,
-            teacherUpn: teacher.userPrincipalName,
-            substituteId: substitute.id,
-            substituteName: substitute.displayName,
-            substituteUpn: substitute.userPrincipalName,
-            teamId: match.id,
-            teamName: match.displayName,
-            expirationTimestamp: expirationTimestamp
-          })
-        }
+      // Retreive everything the teacher owns
+      let ownedResources = await callMSGraph({
+        url: `https://graph.microsoft.com/v1.0/users/${upn}/ownedObjects?$select=id,displayName,mail`
+      })
+      if(!ownedResources) throw new Error(`Kunne ikke hente ut hvilke teams som '${upn}' eier`)
+      if(ownedResources.value) ownedResources = ownedResources.value
+
+      teacher.owned = ownedResources;
+      teachers.push(teacher);
+    }
+
+    // Create the database requests for creating/renewing the substitutions
+    var expirationTimestamp = new Date(new Date().setHours(1,0,0,0) + (2 * 24 * 60 * 60 * 1000)) // Midnight two days in the future
+    const newSubstitutions = []; // New substitutions that has not happened before
+    const renewedSubstitutions = []; // Renewals of substitutions that has occured before
+    for(const substitution of req.body) {
+      // Get the substitute and teacher
+      const substitute = substitutes.find((i) => i.userPrincipalName === substitution.substituteUpn)
+      const teacher = teachers.find((i) => i.userPrincipalName === substitution.teacherUpn)
+
+      // Verify that the teacher owns the requested team and that it is valid for substitution
+      const team = teacher.owned?.find((i) => i.id === substitution.teamId)
+      if(!team) throw new Error(`Kan ikke sette opp vikariat fordi læreren ikke eier team med id '${substitution.teamId}'`)
+      if(!team['@odata.type'] || team['@odata.type'] !== '#microsoft.graph.group') throw new Error(`Kan ikke sette opp vikariat fordi ressurs ${substitution.teamId} ikke er en gruppe`)
+      if(!team.mail || !team.mail.toLowerCase().startsWith('section_')) throw new Error(`Kan ikke sette opp vikariat fordi ressurs ${substitution.teamId} ikke er ett skole team`)
+
+      // Check if the subsitution is currently active and should be extended
+      const existingSubstitution = substitute.substitutions?.find((i) => i.teamId === substitution.teamId && i.status !== 'expired')
+
+      if(existingSubstitution) {
+        renewedSubstitutions.push({
+          _id: existingSubstitution._id,
+          expirationTimestamp: expirationTimestamp
+        })
+      } else {
+        newSubstitutions.push({
+          status: 'pending',
+          teacherId: teacher.id,
+          teacherName: teacher.displayName,
+          teacherUpn: teacher.userPrincipalName,
+          substituteId: substitute.id,
+          substituteName: substitute.displayName,
+          substituteUpn: substitute.userPrincipalName,
+          teamId: team.id,
+          teamName: team.displayName,
+          expirationTimestamp: expirationTimestamp
+        })
       }
     }
 
@@ -116,9 +116,6 @@ module.exports = async function (context, req) {
       const result = await db.Substitutions.findByIdAndUpdate(renewal._id, renewal, { new: true })
       documents = [...documents, result]
     }
-
-    console.log('New substitutions:', newSubstitutions)
-    console.log('Renewed substitutions:', renewedSubstitutions)
 
     // Send the response
     return await azfHandleResponse(documents, context, req)
