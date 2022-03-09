@@ -1,8 +1,6 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const db = require('../lib/db')
-
 const { prepareRequest } = require('../lib/_helpers')
-const { callMSGraph } = require('../lib/msgraph')
 
 module.exports = async function (context, req) {
   try {
@@ -10,7 +8,7 @@ module.exports = async function (context, req) {
     await prepareRequest(req)
 
     // Connect to dabase
-    await db.connect();
+    await db.connect()
 
     // Get all substitupe relationships
     const data = await db.Schools.findByIdAndUpdate(req.params.id, req.body)

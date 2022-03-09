@@ -11,7 +11,7 @@ module.exports = async function (context, req) {
     await prepareRequest(req, { required })
 
     // Connect to dabase
-    await db.connect();
+    await db.connect()
 
     // Get all substitupe relationships
     const data = await db.Schools.create(req.body)
