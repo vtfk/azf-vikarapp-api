@@ -7,7 +7,7 @@ const { server } = require('../mocks/server');
 /*
   Import routes
 */
-const getTeacherTeams = require('../func-GetTeacherTeams');
+// const getTeacherTeams = require('../func-GetTeacherTeams');
 
 /*
   Setup
@@ -22,12 +22,16 @@ afterAll(() => server.close())
 /*
   Tests
 */
+// const headers = {
+//   Authorization: 'test'
+// }
 test('Always ok', () => expect(1).toBe(1))
 
 // describe('Test GetTeachers endpoint', () => {
 //   test('Retreive a teacher', async () => {
 //     const request = {
-//       params: { upn: 'noen.andre@vtfk.no' }
+//       params: { upn: 'noen.andre@vtfk.no' },
+//       headers: headers
 //     }
 
 //     const response = await getTeacherTeams(null, request);
