@@ -8,7 +8,7 @@ module.exports = async function (context, req) {
   try {
     // Prepare the request
     const { requestor } = await prepareRequest(req)
-
+    console.log('Requestor', requestor)
     // Connect to dabase
     await db.connect()
 
