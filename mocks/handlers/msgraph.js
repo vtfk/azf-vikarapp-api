@@ -15,7 +15,12 @@ const handlers = [
       })
     )
   }),
-  rest.get('https://graph.microsoft.com/v1.0/users/*/ownedObjects', (req, res, ctx) => {
+  rest.get('https://graph.microsoft.com/v1.0/groups/:groupid/members*', (req, res, ctx) => {
+    return res(
+      ctx.json(require('../data/teachers'))
+    )
+  }),
+  rest.get('https://graph.microsoft.com/v1.0/users/:upn/ownedObjects', (req, res, ctx) => {
     return res(
       ctx.json(require('../data/getUserTeams'))
     )

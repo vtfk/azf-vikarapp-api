@@ -31,14 +31,12 @@ module.exports = async function (context, req) {
 
     // Check if the requestor can return it self
     let exludeSelfFilter = ''
-    if (!req.query.returnSelf) exludeSelfFilter = `$filter=userPrincipalName ne '${requestor.upn}'&`
-
-    console.log('Params', req.query)
+    if (!req.query?.returnSelf) exludeSelfFilter = `$filter=userPrincipalName ne '${requestor.upn}'&`
 
     /*
       Make request
     */
-    const url = `https://graph.microsoft.com/v1.0/groups/${config.searchGroupId}/members?${exludeSelfFilter}$search="displayName:${term}"`
+    const url = `https://graph.microsoft.com/v1.0/groups/${config.searchGroupId}/members?${exludeSelfFilter}$search="displayName:${term}"&$select=id,displayName,jobTitle,officeLocation,userPrincipalName`
     const request = {
       url: url,
       metod: 'get',
@@ -50,9 +48,8 @@ module.exports = async function (context, req) {
     const response = await callMSGraph(request)
 
     // Normalize the data
-    let data
+    let data = response
     if (response?.value) data = response?.value
-    else data = []
 
     // Determine of any of the search results should be filtered out
     if (Array.isArray(allowedLocations) && allowedLocations.length > 0) {

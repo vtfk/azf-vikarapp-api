@@ -10,7 +10,7 @@ module.exports = async function (context, req) {
 
     // Make the request
     const request = {
-      url: `https://graph.microsoft.com/v1.0/users/${req.params.upn}/ownedObjects`,
+      url: `https://graph.microsoft.com/v1.0/users/${req.params.upn}/ownedObjects?$select=id,displayName,mail,description`,
       metod: 'get',
       headers: {
         ConsistencyLevel: 'eventual'
@@ -20,9 +20,8 @@ module.exports = async function (context, req) {
     const response = await callMSGraph(request)
 
     // Prepare the response
-    let data
-    if (response?.value) data = response?.value
-    else data = []
+    let data = response
+    if (response?.value) data = response.value
 
     // Remove every item that is not a SDS team
     data = data.filter((i) => i.mail && i.mail.toLowerCase().startsWith('section_'))
