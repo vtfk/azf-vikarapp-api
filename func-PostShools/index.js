@@ -7,7 +7,7 @@ module.exports = async function (context, req) {
   try {
     // Prepare the request
     const required = ['body.name']
-    console.log('Body', req.body)
+
     await prepareRequest(req, { required })
 
     // Connect to dabase

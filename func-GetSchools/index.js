@@ -12,7 +12,7 @@ module.exports = async function (context, req) {
 
     // Retreive data from database
     await connect()
-    const data = await Schools.find() || []
+    const data = await Schools.find().lean() || []
 
     // Return
     return await azfHandleResponse(data, context, req)

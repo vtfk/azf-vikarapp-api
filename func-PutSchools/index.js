@@ -10,8 +10,8 @@ module.exports = async function (context, req) {
     // Connect to dabase
     await db.connect()
 
-    // Get all substitupe relationships
-    const data = await db.Schools.findByIdAndUpdate(req.params.id, req.body)
+    // Update the school
+    const data = await db.Schools.findByIdAndUpdate(req.params.id, req.body, { new: true })
 
     // Send the response
     return await azfHandleResponse(data, context, req)
