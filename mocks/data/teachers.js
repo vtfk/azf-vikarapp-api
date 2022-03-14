@@ -6,7 +6,7 @@ module.exports = [
       "id": nanoid(),
       "displayName": "Test Testesen I",
       "jobTitle": "Tester",
-      "officeLocation": "Test avdelingen",
+      "officeLocation": "School #1",
       "userPrincipalName": "tt1@vtfk.no"
   },
   {
@@ -14,7 +14,7 @@ module.exports = [
       "id": nanoid(),
       "displayName": "Test Testesen II",
       "jobTitle": "Tester",
-      "officeLocation": "Test avdelingen",
+      "officeLocation": "School #2",
       "userPrincipalName": "tt2@vtfk.no"
   },
   {
@@ -22,7 +22,7 @@ module.exports = [
       "id": nanoid(),
       "displayName": "Test Testesen III",
       "jobTitle": "Tester",
-      "officeLocation": "Test avdelingen",
+      "officeLocation": "School #2",
       "userPrincipalName": "tt3@vtfk.no"
   },
   {
@@ -30,7 +30,7 @@ module.exports = [
       "id": nanoid(),
       "displayName": "Test Testesen IIII",
       "jobTitle": "Tester",
-      "officeLocation": "Test avdelingen",
+      "officeLocation": "School #3",
       "userPrincipalName": "tt4@vtfk.no"
   },
   {
@@ -38,7 +38,7 @@ module.exports = [
       "id": nanoid(),
       "displayName": "Test Testesen V",
       "jobTitle": "Tester",
-      "officeLocation": "Ett annet sted",
+      "officeLocation": "School #3",
       "userPrincipalName": "tt5@vtfk.no"
   }
 ]

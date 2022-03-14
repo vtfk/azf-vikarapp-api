@@ -33,15 +33,28 @@ afterEach(() => server.resetHandlers())
 /*
   Tests
 */
-const headers = {
-  Authorization: 'test'
+const request = {
+  headers: {
+    Authorization: 'test'
+  },
+  requestor: {
+    id: '123',
+    sid: '123',
+    ipaddress: '8.8.4.4',
+    name: 'Test Testesen I',
+    upn: 'tt1@vtfk.no',
+    givenName: 'Test',
+    familyName: 'Testesen',
+    jobTitle: 'Tester',
+    department: 'Test avdelingen',
+    officeLocation: 'School #1',
+    roles: ['App.Admin', 'App.Config'],
+    scopes: ['123']
+  }
 }
 
 describe('Test Schools', () => {
-  const request = {
-    headers: headers
-  }
-  test('Post 5 schools', async () => {
+  test('Post 3 schools', async () => {
     const schools = require('./data/schools')
     for(const school of schools) {
       const response = await postSchools(null, { ...request, body: school })
@@ -50,10 +63,10 @@ describe('Test Schools', () => {
   })
 
   let allSchools = []
-  test('Get the 5 schools', async () => {
+  test('Get all schools', async () => {
     let response = await getSchools(null, request)
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(5);
+    expect(response.body.length).toBe(3);
     allSchools = response.body;
   })
 
@@ -67,7 +80,7 @@ describe('Test Schools', () => {
     }
     let response = await putSchools(null, req)
     expect(response.status).toBe(200);
-    expect(response.body.permittedSchools.length).toBe(4);
+    expect(response.body.permittedSchools.length).toBe(2);
   })
 
   test('Give school #2 permissions to School #1', async () => {
@@ -82,30 +95,87 @@ describe('Test Schools', () => {
     expect(response.status).toBe(200);
     expect(response.body.permittedSchools.length).toBe(1);
   })
-})
 
-describe('Test GetTeachers', () => {
-  test('Get teachers', async () => {
-    const request = {
-      params: { searchTerm: 'test' },
-      headers: headers
+  test(`Rename 'School #test' to School #3`, async () => {
+    const req = {
+      ...request,
+      params: { id: allSchools[2]._id },
+      body: {
+        name: 'School #3'
+      }
     }
-
-    const response = await getTeachers(null, request);
+    let response = await putSchools(null, req)
     expect(response.status).toBe(200);
-    expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body[0].displayName).toBeTruthy();
+    expect(response.body.name).toBe('School #3');
   })
 })
 
-describe('Test GetTeacherTeams endpoint', () => {
+describe('Test GetTeachers', () => {
+  test('non-admin Teacher in School #1 should see all 5 teachers', async () => {
+    let req = {
+      ...request,
+      params: { searchTerm: 'test' },
+    }
+    req.requestor.officeLocation = 'School #1'
+    req.requestor.roles = ['']
+
+    const response = await getTeachers(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(5);
+    expect(response.body[0].displayName).toBeTruthy();
+  })
+
+  test(`non-admin Teacher in 'School #2' should see only from 'School #1' and 'School #2'`, async () => {
+    let req = {
+      ...request,
+      params: { searchTerm: 'test' }
+    }
+    req.requestor.officeLocation = 'School #2'
+    req.requestor.roles = ['']
+
+    const response = await getTeachers(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+    expect(response.body.includes('School #3')).toBe(false);
+  })
+
+  test(`non-admin Teacher in 'School #3' should only see teachers in 'School #3'`, async () => {
+    let req = {
+      ...request,
+      params: { searchTerm: 'test' }
+    }
+    req.requestor.officeLocation = 'School #3'
+    req.requestor.roles = ['']
+
+    const response = await getTeachers(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(2);
+    expect(!response.body.includes('School #1') && !response.body.includes('School #3')).toBe(true);
+  })
+
+  test(`Admin Teacher in 'School #3' should see all teachers`, async () => {
+    let req = {
+      ...request,
+      params: { searchTerm: 'test' }
+    }
+    req.requestor.roles = ['App.Admin'];
+    req.requestor.officeLocation = 'School #3'
+
+    const response = await getTeachers(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(5);
+  })
+
+})
+
+describe('Test GetTeacherTeams', () => {
   test('Retreive a teacher', async () => {
-    const request = {
+    const req = {
+      ...request,
       params: { upn: 'noen.andre@vtfk.no' },
-      headers: headers
     }
 
-    const response = await getTeacherTeams(null, request);
+    const response = await getTeacherTeams(null, req);
     expect(response.status).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body[0].displayName).toBeTruthy();
