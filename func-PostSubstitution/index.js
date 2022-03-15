@@ -2,7 +2,7 @@ const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const db = require('../lib/db')
 
 const { prepareRequest } = require('../lib/_helpers')
-const { callMSGraph } = require('../lib/msgraph')
+const { callMSGraph, getUser } = require('../lib/msgraph')
 
 module.exports = async function (context, req) {
   try {
@@ -35,9 +35,7 @@ module.exports = async function (context, req) {
     const substitutes = []
     for (const upn of uniqueSubstituteUpns) {
       // Get the substitute from MS graph
-      const substitute = await callMSGraph({
-        url: `https://graph.microsoft.com/v1.0/users/${upn}`
-      })
+      const substitute = await getUser(upn)
       if (!substitute) throw new Error(`Kunne ikke finne vikarlærer '${upn}'`)
 
       // Attempt to find existing substituions in the database

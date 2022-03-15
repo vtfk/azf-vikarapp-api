@@ -54,5 +54,12 @@ module.exports = [
         "displayName": "BJOERN-BDK-SDS-TEST-NULL-NI",
         "mail": "Section_BDK-SDS-TEST09@vtfk.no",
         "description": "BDK-SDS-TEST-NULL-NI"
+    },
+    {
+        "@odata.type": "#microsoft.graph.group",
+        id: "27a90494-e7cc-49d9-bd12-e7f14a7d2bc1",
+        displayName: "VTFK-BDK-NOTSDS-TEST-NULL-EN",
+        mail: "NOTSDSTEAM_BDK-SDS-TEST09@vtfk.no",
+        description: "VTFK-BDK-NOTSDS-TEST-NULL-EN"
     }
 ]
