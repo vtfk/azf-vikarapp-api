@@ -13,9 +13,9 @@ module.exports = async function (context, req) {
     await db.connect()
 
     // Get the substitute and teacher upn from the query
-    const status = req.query.status
-    const substituteUpn = req.query.substituteUpn
-    const teacherUpn = req.query.teacherUpn
+    const status = req.query?.status
+    const substituteUpn = req.query?.substituteUpn
+    const teacherUpn = req.query?.teacherUpn
 
     // If the requestor is not admin, make sure that it has permissions for the call
     if (!requestor.roles.includes('App.Admin')) {

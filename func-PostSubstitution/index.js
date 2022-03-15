@@ -45,8 +45,10 @@ module.exports = async function (context, req) {
       if (existingSubstitutions) substitute.substitutions = existingSubstitutions
 
       // If the requestor is not admin, get the substitutes permittedLocations
-      if (!requestor.roles.includes('App.Admin')) substitute.permittedLocations = await getPermittedLocations(substitute.officeLocation)
-      if (!substitute.permittedLocations || !Array.isArray(substitute.permittedLocations) || substitute.permittedLocations.length === 0) throw new Error(`Vikar '${upn}' har ikke rettigheter til å vikariere for noen`)
+      if (!requestor.roles.includes('App.Admin')) {
+        substitute.permittedLocations = await getPermittedLocations(substitute.officeLocation)
+        if (!substitute.permittedLocations || !Array.isArray(substitute.permittedLocations) || substitute.permittedLocations.length === 0) throw new Error(`Vikar '${upn}' har ikke rettigheter til å vikariere for noen`)
+      }
 
       substitutes.push(substitute)
     }

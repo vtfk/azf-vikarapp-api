@@ -336,7 +336,6 @@ describe('Substitutions', () => {
   test(`Teacher 's3t1@vtfk.no' in 'School #3' should NOT be able to substitute for 's1t1@vtfk.no`, async () => {
     let req = {
       ...request,
-      params: { upn: 's1t1@vtfk.no' },
       outputError: false
     }
     req.requestor.upn = 's3t1@vtfk.no';
@@ -345,8 +344,8 @@ describe('Substitutions', () => {
 
     req.body = tt1Teams.map((i) => { 
       return { 
-        substituteUpn: req.requestor.upn,
-        teacherUpn: req.params.upn,
+        substituteUpn: 's3t1@vtfk.no',
+        teacherUpn: 's1t1@vtfk.no',
         teamId: i.id
       }
     })
@@ -356,7 +355,85 @@ describe('Substitutions', () => {
     expect(response.body.message).toBeTruthy();
   })
 
+  test(`Admin 's3t2@vtfk.no' should be able to make 's3t1@vtfk.no' substitute for 's1t1@vtfk.no'`, async () => {
+    let req = {
+      ...request,
+      requestor: {
+        ...request.requestor,
+        upn: 's3t2@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['App.Admin']
+      }
+    }
 
+    req.body = tt1Teams.map((i) => { 
+      return { 
+        substituteUpn: 's3t1@vtfk.no',
+        teacherUpn: 's1t1@vtfk.no',
+        teamId: i.id
+      }
+    })
+
+    const response = await postSubstitutions(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(1);
+  })
+
+  test(`Admin 's3t2@vtfk.no' should be able to GET all substitutions`, async () => {
+    let req = {
+      ...request,
+      requestor: {
+        ...request.requestor,
+        upn: 's3t2@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['App.Admin']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThanOrEqual(5);
+  })
+
+  test(`Query 'substituteUpn=s1t1@vtfk.no' should yeild only 's1t1@vtfk.no' as substitute in the results`, async () => {
+    let req = {
+      ...request,
+      query: {
+        substituteUpn: 's1t1@vtfk.no'
+      },
+      requestor: {
+        ...request.requestor,
+        upn: 's3t2@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['App.Admin']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+    expect(response.body.filter((i) => i.substituteUpn !== 's1t1@vtfk.no').length).toBe(0);
+  })
+
+  test(`Query 'teacherUpn=s1t1@vtfk.no' should yeild only 's1t1@vtfk.no' as teacher in the results`, async () => {
+    let req = {
+      ...request,
+      query: {
+        teacherUpn: 's1t1@vtfk.no'
+      },
+      requestor: {
+        ...request.requestor,
+        upn: 's3t2@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['App.Admin']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+    expect(response.body.filter((i) => i.teacherUpn !== 's1t1@vtfk.no').length).toBe(0);
+  })
 
 })
 
