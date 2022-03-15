@@ -1,6 +1,6 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const { prepareRequest } = require('../lib/_helpers')
-const { callMSGraph } = require('../lib/msgraph')
+const { getOwnedObjects } = require('../lib/msgraph')
 
 module.exports = async function (context, req) {
   try {
@@ -8,22 +8,10 @@ module.exports = async function (context, req) {
     const required = ['params.upn']
     await prepareRequest(req, { required })
 
-    // Make the request
-    const request = {
-      url: `https://graph.microsoft.com/v1.0/users/${req.params.upn}/ownedObjects?$select=id,displayName,mail,description`,
-      metod: 'get',
-      headers: {
-        ConsistencyLevel: 'eventual'
-      }
-    }
+    // Retreive the owned objects
+    let data = await getOwnedObjects(req.params.upn)
 
-    const response = await callMSGraph(request)
-
-    // Prepare the response
-    let data = response
-    if (response?.value) data = response.value
-
-    // Remove every item that is not a SDS team
+    // Filter out any resources that is not an SDS team
     data = data.filter((i) => i.mail && i.mail.toLowerCase().startsWith('section_'))
 
     // Send the response

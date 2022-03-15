@@ -1,7 +1,8 @@
 const config = require('../config')
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const { prepareRequest } = require('../lib/_helpers')
-const { searchUsers } = require('../lib/msgraph')
+const { searchUsersInGroup } = require('../lib/msgraph')
+const { getPermittedLocations } = require('../lib/getPermittedLocations')
 
 module.exports = async function (context, req) {
   try {
@@ -15,7 +16,21 @@ module.exports = async function (context, req) {
     if (!term) throw new Error('Du kan ikke gjøre ett tomt søk etter lærer')
 
     // Do the search;
-    const data = await searchUsers(term, req, requestor)
+    let data = await searchUsersInGroup(term, config.searchGroupId, requestor, req.query?.returnSelf)
+
+    // If the user is not admin, filter out any
+    if (!requestor.roles.includes('App.Admin')) {
+      // Get the requestors permitted locations
+      const permittedLocations = await getPermittedLocations(requestor)
+
+      // If the requestor has none permitted locations, return an empty array
+      if (!permittedLocations || !Array.isArray(permittedLocations) || permittedLocations.length === 0) data = []
+      else {
+        // Filter out users that are not part of the permitted locations
+        const permittedLocationNames = permittedLocations.map((i) => i.name)
+        data = data.filter((i) => permittedLocationNames.includes(i.officeLocation))
+      }
+    }
 
     // Send the response
     return await azfHandleResponse(data, context, req)
