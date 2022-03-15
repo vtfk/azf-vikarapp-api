@@ -19,8 +19,8 @@ module.exports = async function (context, req) {
 
     // If the requestor is not admin, make sure that it has permissions for the call
     if (!requestor.roles.includes('App.Admin')) {
-      if (!substituteUpn && !teacherUpn) throw new HTTPError(401, 'Du har ikke rettigheter til å søke etter alle vikarieter', 'Søk etter vikariat feilet')
-      if (substituteUpn !== requestor.upn && teacherUpn !== requestor.upn) throw new HTTPError(401, 'Du har ikke rettigheter til å søke vikariat hvor du selv ikke er lærer eller vikar', 'Søk etter vikariat feilet')
+      if (!substituteUpn && !teacherUpn) throw new HTTPError(401, 'Du har ikke rettigheter til å søke etter alle vikarieter', 'Manglende rettigheter')
+      if (substituteUpn !== requestor.upn && teacherUpn !== requestor.upn) throw new HTTPError(401, 'Du har ikke rettigheter til å søke vikariat hvor du selv ikke er lærer eller vikar', 'Manglende rettigheter')
     }
 
     // Define the filter
