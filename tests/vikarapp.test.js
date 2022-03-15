@@ -435,6 +435,102 @@ describe('Substitutions', () => {
     expect(response.body.filter((i) => i.teacherUpn !== 's1t1@vtfk.no').length).toBe(0);
   })
 
+  test(`non-admin user 's3t1@vtfk.no' should not be able to GET all substitutions`, async () => {
+    let req = {
+      ...request,
+      outputError: false,
+      requestor: {
+        ...request.requestor,
+        upn: 's3t1@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBeTruthy();
+  })
+
+  test(`non-admin user 's3t1@vtfk.no' should not be able to get 's1t1@vtfk.no' substitutions`, async () => {
+    let req = {
+      ...request,
+      outputError: false,
+      query: {
+        substituteUpn: 's1t1@vtfk.no'
+      },
+      requestor: {
+        ...request.requestor,
+        upn: 's3t1@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBeTruthy();
+  })
+
+  test(`non-admin user 's3t1@vtfk.no' should not be able to get where 's1t1@vtfk.no' was teacher`, async () => {
+    let req = {
+      ...request,
+      outputError: false,
+      query: {
+        teacherUpn: 's1t1@vtfk.no'
+      },
+      requestor: {
+        ...request.requestor,
+        upn: 's3t1@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBeTruthy();
+  })
+
+  test(`non-admin user 's3t1@vtfk.no' should not be able to get where self was substitute`, async () => {
+    let req = {
+      ...request,
+      outputError: false,
+      query: {
+        substituteUpn: 's3t1@vtfk.no'
+      },
+      requestor: {
+        ...request.requestor,
+        upn: 's3t1@vtfk.no',
+        officeLocation: 'School #3',
+        roles: ['']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+  })
+
+  test(`non-admin user 's1t2@vtfk.no' should not be able to get where self was teacher`, async () => {
+    let req = {
+      ...request,
+      query: {
+        teacherUpn: 's1t2@vtfk.no'
+      },
+      requestor: {
+        ...request.requestor,
+        upn: 's1t2@vtfk.no',
+        officeLocation: 'School #1',
+        roles: ['']
+      }
+    }
+
+    const response = await GetSubstitutions(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+  })
+
 })
 
 // Clean up after the tests are finished.
