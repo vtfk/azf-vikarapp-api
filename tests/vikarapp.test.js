@@ -435,7 +435,7 @@ describe('Substitutions', () => {
     expect(response.body.filter((i) => i.teacherUpn !== 's1t1@vtfk.no').length).toBe(0);
   })
 
-  test(`non-admin user 's3t1@vtfk.no' should not be able to GET all substitutions`, async () => {
+  test(`non-admin user 's3t1@vtfk.no' should NOT be able to GET all substitutions`, async () => {
     let req = {
       ...request,
       outputError: false,
@@ -452,7 +452,7 @@ describe('Substitutions', () => {
     expect(response.body.message).toBeTruthy();
   })
 
-  test(`non-admin user 's3t1@vtfk.no' should not be able to get 's1t1@vtfk.no' substitutions`, async () => {
+  test(`non-admin user 's3t1@vtfk.no' should NOT be able to get 's1t1@vtfk.no' substitutions`, async () => {
     let req = {
       ...request,
       outputError: false,
@@ -472,7 +472,7 @@ describe('Substitutions', () => {
     expect(response.body.message).toBeTruthy();
   })
 
-  test(`non-admin user 's3t1@vtfk.no' should not be able to get where 's1t1@vtfk.no' was teacher`, async () => {
+  test(`non-admin user 's3t1@vtfk.no' should NOT be able to get where 's1t1@vtfk.no' was teacher`, async () => {
     let req = {
       ...request,
       outputError: false,
@@ -492,7 +492,7 @@ describe('Substitutions', () => {
     expect(response.body.message).toBeTruthy();
   })
 
-  test(`non-admin user 's3t1@vtfk.no' should not be able to get where self was substitute`, async () => {
+  test(`non-admin user 's3t1@vtfk.no' SHOULD be able to get where self was substitute`, async () => {
     let req = {
       ...request,
       outputError: false,
@@ -512,7 +512,7 @@ describe('Substitutions', () => {
     expect(response.body.length).toBeGreaterThan(0);
   })
 
-  test(`non-admin user 's1t2@vtfk.no' should not be able to get where self was teacher`, async () => {
+  test(`non-admin user 's1t2@vtfk.no' SHOULD be able to get where self was teacher`, async () => {
     let req = {
       ...request,
       query: {
