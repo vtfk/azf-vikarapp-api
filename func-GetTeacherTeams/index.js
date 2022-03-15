@@ -17,7 +17,7 @@ module.exports = async function (context, req) {
       if (!user) throw new Error(`Kunne ikke finne en bruker med upn '${req.params.upn}'`)
 
       // Get the requestors permitted locations
-      const permittedLocations = await getPermittedLocations(requestor)
+      const permittedLocations = await getPermittedLocations(requestor.officeLocation)
       const permittedNames = permittedLocations.map((i) => i.name)
 
       // Throw if the user is not in the permitted locations

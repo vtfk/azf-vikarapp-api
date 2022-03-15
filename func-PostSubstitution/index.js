@@ -2,7 +2,9 @@ const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const db = require('../lib/db')
 
 const { prepareRequest } = require('../lib/_helpers')
-const { callMSGraph, getUser } = require('../lib/msgraph')
+const { getUser, getOwnedObjects } = require('../lib/msgraph')
+const { getPermittedLocations } = require('../lib/getPermittedLocations')
+const HTTPError = require('../lib/httperror')
 
 module.exports = async function (context, req) {
   try {
@@ -42,6 +44,10 @@ module.exports = async function (context, req) {
       const existingSubstitutions = await db.Substitutions.find({ substituteId: substitute.id })
       if (existingSubstitutions) substitute.substitutions = existingSubstitutions
 
+      // If the requestor is not admin, get the substitutes permittedLocations
+      if (!requestor.roles.includes('App.Admin')) substitute.permittedLocations = await getPermittedLocations(substitute.officeLocation)
+      if (!substitute.permittedLocations || !Array.isArray(substitute.permittedLocations) || substitute.permittedLocations.length === 0) throw new Error(`Vikar '${upn}' har ikke rettigheter til å vikariere for noen`)
+
       substitutes.push(substitute)
     }
 
@@ -49,16 +55,12 @@ module.exports = async function (context, req) {
     const teachers = []
     for (const upn of uniqueTeacherUpns) {
       // Retreive the teacher information
-      const teacher = await callMSGraph({
-        url: `https://graph.microsoft.com/v1.0/users/${upn}`
-      })
-      if (!teacher || !teacher.id) throw new Error(`Kunne ikke finne lærer '${upn}'`)
+      const teacher = await getUser(upn)
+      if (!teacher || !teacher.id) throw new HTTPError(400, `Kunne ikke finne lærer '${upn}'`)
 
       // Retreive everything the teacher owns
-      let ownedResources = await callMSGraph({
-        url: `https://graph.microsoft.com/v1.0/users/${upn}/ownedObjects?$select=id,displayName,mail`
-      })
-      if (!ownedResources) throw new Error(`Kunne ikke hente ut hvilke teams som '${upn}' eier`)
+      let ownedResources = await getOwnedObjects(upn)
+      if (!ownedResources) throw new HTTPError(400, `Kunne ikke hente ut hvilke teams som '${upn}' eier`)
       if (ownedResources.value) ownedResources = ownedResources.value
 
       teacher.owned = ownedResources
@@ -74,11 +76,18 @@ module.exports = async function (context, req) {
       const substitute = substitutes.find((i) => i.userPrincipalName === substitution.substituteUpn)
       const teacher = teachers.find((i) => i.userPrincipalName === substitution.teacherUpn)
 
+      // Make sure that the substitute has permissions to substitute for the teacher
+      if (!requestor.roles.includes('App.Admin')) {
+        if (!Array.isArray(substitute.permittedLocations) || substitute.permittedLocations.length === 0) throw new HTTPError(400, `Klarer ikke å finne ut om vikar har rettigheter til å vikariere for lærer '${teacher.userPrincipalName}'`)
+        const permittedNames = substitute.permittedLocations.map((i) => i.name)
+        if (!permittedNames.includes(teacher.officeLocation)) throw new HTTPError(401, `Vikar '${substitute.userPrincipalName}' har ikke rettigheter til å vikariere for '${teacher.userPrincipalName}'`)
+      }
+
       // Verify that the teacher owns the requested team and that it is valid for substitution
       const team = teacher.owned?.find((i) => i.id === substitution.teamId)
-      if (!team) throw new Error(`Kan ikke sette opp vikariat fordi læreren ikke eier team med id '${substitution.teamId}'`)
-      if (!team['@odata.type'] || team['@odata.type'] !== '#microsoft.graph.group') throw new Error(`Kan ikke sette opp vikariat fordi ressurs ${substitution.teamId} ikke er en gruppe`)
-      if (!team.mail || !team.mail.toLowerCase().startsWith('section_')) throw new Error(`Kan ikke sette opp vikariat fordi ressurs ${substitution.teamId} ikke er ett skole team`)
+      if (!team) throw new HTTPError(400, `Kan ikke sette opp vikariat fordi læreren ikke eier team med id '${substitution.teamId}'`)
+      if (!team['@odata.type'] || team['@odata.type'] !== '#microsoft.graph.group') throw new HTTPError(400, `Kan ikke sette opp vikariat fordi ressurs ${substitution.teamId} ikke er en gruppe`)
+      if (!team.mail || !team.mail.toLowerCase().startsWith('section_')) throw new HTTPError(400, `Kan ikke sette opp vikariat fordi ressurs ${substitution.teamId} ikke er ett skole team`)
 
       // Check if the subsitution is currently active and should be extended
       const existingSubstitution = substitute.substitutions?.find((i) => i.teamId === substitution.teamId && i.status !== 'expired')

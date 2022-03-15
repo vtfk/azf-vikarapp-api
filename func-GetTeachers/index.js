@@ -21,7 +21,7 @@ module.exports = async function (context, req) {
     // If the user is not admin, filter out any
     if (!requestor.roles.includes('App.Admin')) {
       // Get the requestors permitted locations
-      const permittedLocations = await getPermittedLocations(requestor)
+      const permittedLocations = await getPermittedLocations(requestor.officeLocation)
 
       // If the requestor has none permitted locations, return an empty array
       if (!permittedLocations || !Array.isArray(permittedLocations) || permittedLocations.length === 0) data = []

@@ -44,7 +44,7 @@ const request = {
     sid: '123',
     ipaddress: '8.8.4.4',
     name: 'Test Testesen I',
-    upn: 'tt1@vtfk.no',
+    upn: 's1t1@vtfk.no',
     givenName: 'Test',
     familyName: 'Testesen',
     jobTitle: 'Tester',
@@ -112,7 +112,7 @@ describe('Test Schools', () => {
   })
 })
 
-describe('Test GetTeachers', () => {
+describe('Teachers', () => {
   test(`non-admin Teacher in 'School #1' should see all teachers except self`, async () => {
     let req = {
       ...request,
@@ -123,7 +123,7 @@ describe('Test GetTeachers', () => {
 
     const response = await getTeachers(null, req);
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(4);
+    expect(response.body.length).toBe(5);
     expect(response.body[0].displayName).toBeTruthy();
     expect(response.body.map((i) => i.userPrincipalName).includes(req.requestor.upn)).toBe(false);
   })
@@ -133,7 +133,7 @@ describe('Test GetTeachers', () => {
       ...request,
       params: { searchTerm: 'test' }
     }
-    req.requestor.upn = 'tt3@vtfk.no'
+    req.requestor.upn = 's2t1@vtfk.no'
     req.requestor.officeLocation = 'School #2'
     req.requestor.roles = ['']
 
@@ -149,7 +149,7 @@ describe('Test GetTeachers', () => {
       ...request,
       params: { searchTerm: 'test' }
     }
-    req.requestor.upn = 'tt4@vtfk.no'
+    req.requestor.upn = 's3t1@vtfk.no'
     req.requestor.officeLocation = 'School #3'
     req.requestor.roles = ['']
 
@@ -165,13 +165,13 @@ describe('Test GetTeachers', () => {
       ...request,
       params: { searchTerm: 'test' }
     }
-    req.requestor.upn = 'tt4@vtfk.no'
+    req.requestor.upn = 's3t1@vtfk.no'
     req.requestor.roles = ['App.Admin'];
     req.requestor.officeLocation = 'School #3'
 
     const response = await getTeachers(null, req);
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(4);
+    expect(response.body.length).toBe(5);
     expect(response.body.map((i) => i.userPrincipalName).includes(req.requestor.upn)).toBe(false);
   })
 
@@ -181,7 +181,7 @@ describe('Test GetTeachers', () => {
       params: { searchTerm: 'test' },
       query: { returnSelf: true }
     }
-    req.requestor.upn = 'tt4@vtfk.no'
+    req.requestor.upn = 's3t1@vtfk.no'
     req.requestor.roles = [];
     req.requestor.officeLocation = 'School #3'
 
@@ -192,13 +192,13 @@ describe('Test GetTeachers', () => {
 
 })
 
-describe('Test GetTeacherTeams', () => {
+describe('TeacherTeams', () => {
   test(`School #1 teacher gets teams for other School #1 teacher `, async () => {
     const req = {
       ...request,
-      params: { upn: 'tt2@vtfk.no' },
+      params: { upn: 's1t2@vtfk.no' },
     }
-    req.requestor.upn = 'tt1@vtfk.no';
+    req.requestor.upn = 's1t1@vtfk.no';
     req.requestor.officeLocation = 'School #1';
 
     const response = await getTeacherTeams(null, req);
@@ -210,9 +210,9 @@ describe('Test GetTeacherTeams', () => {
   test(`School #2 teacher gets teams for School #1 teacher `, async () => {
     const req = {
       ...request,
-      params: { upn: 'tt1@vtfk.no' },
+      params: { upn: 's1t1@vtfk.no' },
     }
-    req.requestor.upn = 'tt3@vtfk.no';
+    req.requestor.upn = 's2t1@vtfk.no';
     req.requestor.officeLocation = 'School #2';
 
     const response = await getTeacherTeams(null, req);
@@ -225,9 +225,9 @@ describe('Test GetTeacherTeams', () => {
     const req = {
       ...request,
       outputError: false,
-      params: { upn: 'tt1@vtfk.no' },
+      params: { upn: 's1t1@vtfk.no' },
     }
-    req.requestor.upn = 'tt4@vtfk.no';
+    req.requestor.upn = 's3t1@vtfk.no';
     req.requestor.officeLocation = 'School #3';
 
     const response = await getTeacherTeams(null, req);
@@ -238,9 +238,9 @@ describe('Test GetTeacherTeams', () => {
   test(`Non-SDS teams and expired teams are filtered out`, async () => {
     const req = {
       ...request,
-      params: { upn: 'tt1@vtfk.no' },
+      params: { upn: 's1t1@vtfk.no' },
     }
-    req.requestor.upn = 'tt1@vtfk.no';
+    req.requestor.upn = 's1t1@vtfk.no';
     req.requestor.officeLocation = 'School #1';
 
     const response = await getTeacherTeams(null, req);
@@ -252,14 +252,14 @@ describe('Test GetTeacherTeams', () => {
   })
 })
 
-describe('Test Substitutions', () => {
+describe('Substitutions', () => {
 
   let renewalRequest = undefined;
   let tt2TeamCount = 0;
-  test(`Add 'tt1@vtfk.no' as substitute for all 'tt1@vtfk.no' teams`, async () => {
-    const upn = 'tt2@vtfk.no';
+  test(`Add 's1t1@vtfk.no' as substitute for all 's1t2@vtfk.no' teams`, async () => {
+    const upn = 's1t2@vtfk.no';
     let req = { ...request, params: { upn: upn }}
-    req.requestor.upn = 'tt1@vtfk.no';
+    req.requestor.upn = 's1t1@vtfk.no';
     req.requestor.officeLocation = 'School #1'
     // Retreive the teachers teams
     const teams = await getTeacherTeams(null, req);
@@ -267,7 +267,7 @@ describe('Test Substitutions', () => {
     const substituteRequest = teams.body.map((i) => { 
       return { 
         substituteUpn: req.requestor.upn,
-        teacherUpn: req.params.upn,
+        teacherUpn: upn,
         teamId: i.id
       }
     })
@@ -288,20 +288,20 @@ describe('Test Substitutions', () => {
     }
   })
 
-  test(`Renew the substitution between 'tt1@vtfk.no' and 'tt2@vtfk.no'`, async () => {
+  test(`Renew the substitution between 's1t1@vtfk.no' and 's1t2@vtfk.no'`, async () => {
     const response = await postSubstitutions(null, renewalRequest)
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(tt2TeamCount);
   })
 
-  test(`Get the substitutions for 'tt1@vtfk.no'`, async () => {
+  test(`Get the substitutions for 's1t1@vtfk.no'`, async () => {
     const req = {
       ...request,
       query: {
-        substituteUpn: 'tt1@vtfk.no'
+        substituteUpn: 's1t1@vtfk.no'
       }
     }
-    req.requestor.upn = 'tt1@vtfk.no';
+    req.requestor.upn = 's1t1@vtfk.no';
     req.requestor.officeLocation = 'School #1'
     const response = await GetSubstitutions(null, req);
     expect(response.status).toBe(200);
@@ -309,14 +309,16 @@ describe('Test Substitutions', () => {
   })
   
   let tt1TeamCount = 0;
-  test(`A teacher in 'tt3@vtfk.no' in 'School #2' should be able to substitute from 'School #1'`, async () => {
-    let req = { ...request, params: { upn: 'tt1@vtfk.no' }}
-    req.requestor.upn = 'tt3@vtfk.no';
+  let tt1Teams = [];
+  test(`Teacher in 's2t1@vtfk.no' in 'School #2' should be able to substitute from 's1t1@vtfk.no`, async () => {
+    let req = { ...request, params: { upn: 's1t1@vtfk.no' }}
+    req.requestor.upn = 's2t1@vtfk.no';
     req.requestor.officeLocation = 'School #2'
-    const tt1Teams = await getTeacherTeams(null, req);
+    const tt1Response = await getTeacherTeams(null, req);
 
-    tt1TeamCount = tt1Teams.body.length;
-    const substituteRequest = tt1Teams.body.map((i) => { 
+    tt1TeamCount = tt1Response.body.length;
+    tt1Teams = tt1Response.body;
+    const substituteRequest = tt1Response.body.map((i) => { 
       return { 
         substituteUpn: req.requestor.upn,
         teacherUpn: req.params.upn,
@@ -330,6 +332,31 @@ describe('Test Substitutions', () => {
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(tt1TeamCount);
   })
+
+  test(`Teacher 's3t1@vtfk.no' in 'School #3' should NOT be able to substitute for 's1t1@vtfk.no`, async () => {
+    let req = {
+      ...request,
+      params: { upn: 's1t1@vtfk.no' },
+      outputError: false
+    }
+    req.requestor.upn = 's3t1@vtfk.no';
+    req.requestor.officeLocation = 'School #3'
+    req.requestor.roles = [''];
+
+    req.body = tt1Teams.map((i) => { 
+      return { 
+        substituteUpn: req.requestor.upn,
+        teacherUpn: req.params.upn,
+        teamId: i.id
+      }
+    })
+
+    const response = await postSubstitutions(null, req);
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBeTruthy();
+  })
+
+
 
 })
 
