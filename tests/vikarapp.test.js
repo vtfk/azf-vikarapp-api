@@ -111,7 +111,7 @@ describe('Test Schools', () => {
 })
 
 describe('Test GetTeachers', () => {
-  test('non-admin Teacher in School #1 should see all 5 teachers', async () => {
+  test('non-admin Teacher in School #1 should see all teachers except self', async () => {
     let req = {
       ...request,
       params: { searchTerm: 'test' },
@@ -121,15 +121,17 @@ describe('Test GetTeachers', () => {
 
     const response = await getTeachers(null, req);
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(5);
+    expect(response.body.length).toBe(4);
     expect(response.body[0].displayName).toBeTruthy();
+    expect(response.body.map((i) => i.userPrincipalName).includes(req.requestor.upn)).toBe(false);
   })
 
-  test(`non-admin Teacher in 'School #2' should see only from 'School #1' and 'School #2'`, async () => {
+  test(`non-admin Teacher in 'School #2' should see only from 'School #1' and 'School #2' except self`, async () => {
     let req = {
       ...request,
       params: { searchTerm: 'test' }
     }
+    req.requestor.upn = 'tt3@vtfk.no'
     req.requestor.officeLocation = 'School #2'
     req.requestor.roles = ['']
 
@@ -137,33 +139,53 @@ describe('Test GetTeachers', () => {
     expect(response.status).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
     expect(response.body.includes('School #3')).toBe(false);
+    expect(response.body.map((i) => i.userPrincipalName).includes(req.requestor.upn)).toBe(false);
   })
 
-  test(`non-admin Teacher in 'School #3' should only see teachers in 'School #3'`, async () => {
+  test(`non-admin Teacher in 'School #3' should only see teachers in 'School #3' except self`, async () => {
     let req = {
       ...request,
       params: { searchTerm: 'test' }
     }
+    req.requestor.upn = 'tt4@vtfk.no'
     req.requestor.officeLocation = 'School #3'
     req.requestor.roles = ['']
 
     const response = await getTeachers(null, req);
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(2);
+    expect(response.body.length).toBe(1);
     expect(!response.body.includes('School #1') && !response.body.includes('School #3')).toBe(true);
+    expect(response.body.map((i) => i.userPrincipalName).includes(req.requestor.upn)).toBe(false);
   })
 
-  test(`Admin Teacher in 'School #3' should see all teachers`, async () => {
+  test(`Admin Teacher in 'School #3' should see all teachers except self`, async () => {
     let req = {
       ...request,
       params: { searchTerm: 'test' }
     }
+    req.requestor.upn = 'tt4@vtfk.no'
     req.requestor.roles = ['App.Admin'];
     req.requestor.officeLocation = 'School #3'
 
     const response = await getTeachers(null, req);
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(5);
+    expect(response.body.length).toBe(4);
+    expect(response.body.map((i) => i.userPrincipalName).includes(req.requestor.upn)).toBe(false);
+  })
+
+  test(`Teacher in 'School #3 should see self when 'returnSelf=true'`, async () => {
+    let req = {
+      ...request,
+      params: { searchTerm: 'test' },
+      query: { returnSelf: true }
+    }
+    req.requestor.upn = 'tt4@vtfk.no'
+    req.requestor.roles = [];
+    req.requestor.officeLocation = 'School #3'
+
+    const response = await getTeachers(null, req);
+    expect(response.status).toBe(200);
+    expect(response.body.map((i) => i.userPrincipalName).includes(req.requestor.upn)).toBe(true);
   })
 
 })
