@@ -22,7 +22,7 @@ const handlers = [
     )
   }),
   rest.get('https://graph.microsoft.com/v1.0/users/:upn', (req, res, ctx) => {
-    const user = teachers.find((i) => i.userPrincipalName === req.params.upn);
+    const user = teachers.find((i) => i.userPrincipalName === req.params.upn || i.id === req.params.upn);
     if(!user) return res(undefined);
 
     return res(ctx.json(user));
@@ -40,6 +40,25 @@ const handlers = [
 
     return res(
       ctx.json(owned)
+    )
+  }),
+  rest.get('https://graph.microsoft.com/v1.0/groups/:groupId/owners', (req, res, ctx) => {
+    const owners = teachers.filter((i) => i.owned?.includes(req.params.groupId))
+    return res(
+      // Just return that it went fine
+      ctx.json(owners)
+    )
+  }),
+  rest.post('https://graph.microsoft.com/v1.0/groups/:groupId/owners/$ref', (req, res, ctx) => {
+    // Just return that it went fine  
+    return res(
+      ctx.json()
+    )
+  }),
+  rest.delete('https://graph.microsoft.com/v1.0/groups/:groupId/owners/:userId/$ref', (req, res, ctx) => {
+    // Just return that it went fine  
+    return res(
+      ctx.json()
     )
   })
 ]

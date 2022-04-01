@@ -2,7 +2,7 @@
   Import dependencies
 */
 const { server } = require('../mocks/server');
-const { disconnect } = require('../lib/db')
+const { disconnect, Substitutions } = require('../lib/db')
 const auth = require('../lib/auth')
 
 /*
@@ -14,12 +14,13 @@ const auth = require('../lib/auth')
   Import routes
 */
 const getSchools = require('../func-GetSchools')
-const postSchools = require('../func-PostShools')
+const postSchools = require('../func-PostSchools')
 const putSchools = require('../func-PutSchools')
 const getTeachers = require('../func-GetTeachers')
 const getTeacherTeams = require('../func-GetTeacherTeams');
 const GetSubstitutions = require('../func-GetSubstitutions')
-const postSubstitutions = require('../func-PostSubstitution')
+const postSubstitutions = require('../func-PostSubstitution');
+const { activateSubstitutions, deactivateSubstitutions } = require('../lib/common');
 
 /*
   Setup
@@ -530,7 +531,74 @@ describe('Substitutions', () => {
     expect(response.status).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
   })
+})
 
+describe('Activate substitutions', () => {
+  let substitutions = [];
+  test(('Retreiving all pending substitutions'), async () => {
+    substitutions = await Substitutions.find({ status: 'pending' });
+  })
+
+  test(('Activating the first substitution'), async () => {
+    const response = await activateSubstitutions(true);
+    expect(response.length).toBe(1);
+    expect(response[0]._id).not.toBe(undefined);
+    expect(response[0].status).toBe('active');
+  })
+
+  test(`Verify that there is one less pending substitution`, async () => {
+    let pendingBefore = substitutions.length;
+    let now = await Substitutions.find({ status: 'pending' });
+    expect(now.length + 1).toBe(pendingBefore);
+  })
+
+  test(('Activate the rest of the substitutions'), async () => {
+    const response = await activateSubstitutions();
+    expect(response.length).toBeGreaterThan(0);
+    expect(response[0]._id).not.toBe(undefined);
+    expect(response[0].status).toBe('active');
+  })
+
+  test(`Verify that there are 0 pending substitutions`, async () => {
+    let subs = await Substitutions.find({ status: 'pending' });
+    expect(subs.length).toBe(0);
+  })
+})
+
+describe('Deactivate/expire substitutions', () => {
+  test('Set expirationTimestamp to yesterday for all substitutions', async () => {
+    var yesterday = new Date().setDate(new Date().getDate() - 1);
+    const response = await Substitutions.updateMany({}, { expirationTimestamp: yesterday}, { new: true });
+
+    expect(response).toBeTruthy();
+    expect(response.modifiedCount).toBeGreaterThan(0);
+
+    const all = await Substitutions.find({ expirationTimestamp: yesterday });
+    expect(all.length).toBe(response.modifiedCount);
+  })
+
+  test('Deactivate the first substitution', async () => {
+    const response = await deactivateSubstitutions(true);
+    expect(response).toBeTruthy();
+    expect(response.length).toBe(1);
+    expect(response[0].status).toBe('expired');
+  })
+
+  test('Verify that there is one expired substitution', async () => {
+    const response = await Substitutions.find({ status: 'expired' })
+    expect(response).toBeTruthy();
+    expect(response.length).toBe(1);
+    expect(response[0].status).toBe('expired');
+  })
+
+  test('Deactivate the rest of the substitutions', async () => {
+    const response = await deactivateSubstitutions();
+    expect(response).toBeTruthy();
+    expect(response.length).toBeGreaterThan(1);
+
+    const notExpired = response.filter((i) => i.status !== 'expired');
+    expect(notExpired.length).toBe(0)
+  })
 })
 
 // Clean up after the tests are finished.
