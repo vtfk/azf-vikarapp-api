@@ -1,4 +1,5 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
+const { logErrorToDB } = require('../lib/common')
 const db = require('../lib/db')
 const HTTPError = require('../lib/httperror')
 
@@ -38,6 +39,7 @@ module.exports = async function (context, req) {
     // Send the response
     return await azfHandleResponse(data, context, req)
   } catch (err) {
+    logErrorToDB(err);
     return await azfHandleError(err, context, req)
   }
 }

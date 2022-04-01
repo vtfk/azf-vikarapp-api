@@ -5,6 +5,7 @@ const { prepareRequest } = require('../lib/_helpers')
 const { getUser, getOwnedObjects } = require('../lib/msgraph')
 const { getPermittedLocations } = require('../lib/getPermittedLocations')
 const HTTPError = require('../lib/httperror')
+const { activateSubstitutions } = require('../lib/common')
 
 module.exports = async function (context, req) {
   try {
@@ -125,6 +126,9 @@ module.exports = async function (context, req) {
       const result = await db.Substitutions.findByIdAndUpdate(renewal._id, renewal, { new: true })
       documents = [...documents, result]
     }
+
+    // Make the request to activate the substitutions in the database
+    await activateSubstitutions();
 
     // Send the response
     return await azfHandleResponse(documents, context, req)
