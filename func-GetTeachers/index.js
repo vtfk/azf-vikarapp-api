@@ -3,12 +3,14 @@ const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const { prepareRequest } = require('../lib/_helpers')
 const { searchUsersInGroup } = require('../lib/msgraph')
 const { getPermittedLocations } = require('../lib/getPermittedLocations')
+const { logErrorToDB } = require('../lib/common')
 
 module.exports = async function (context, req) {
+  let requestor = undefined;
   try {
     // Prepare the request
     const required = ['params.searchTerm']
-    const { requestor } = await prepareRequest(req, { required })
+    ({ requestor } = await prepareRequest(req, { required }))
     if (!config.searchGroupId) throw new Error('Kan ikke gjøre søket fordi at miljøvariabel \'AZURE_SEARCH_GROUP_ID\' ikke er konfigurert i APIet')
 
     // Retreive the search term
@@ -35,6 +37,7 @@ module.exports = async function (context, req) {
     // Send the response
     return await azfHandleResponse(data, context, req)
   } catch (err) {
+    logErrorToDB(err, req, requestor);
     return await azfHandleError(err, context, req)
   }
 }

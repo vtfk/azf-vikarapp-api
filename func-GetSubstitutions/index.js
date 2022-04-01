@@ -6,9 +6,10 @@ const HTTPError = require('../lib/httperror')
 const { prepareRequest } = require('../lib/_helpers')
 
 module.exports = async function (context, req) {
+  let requestor = undefined;
   try {
     // Prepare the request
-    const { requestor } = await prepareRequest(req)
+    ({ requestor } = await prepareRequest(req))
 
     // Connect to dabase
     await db.connect()
@@ -39,7 +40,7 @@ module.exports = async function (context, req) {
     // Send the response
     return await azfHandleResponse(data, context, req)
   } catch (err) {
-    logErrorToDB(err);
+    logErrorToDB(err, req, requestor);
     return await azfHandleError(err, context, req)
   }
 }

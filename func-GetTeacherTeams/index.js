@@ -3,12 +3,14 @@ const { prepareRequest } = require('../lib/_helpers')
 const { getUser, getOwnedObjects } = require('../lib/msgraph')
 const { getPermittedLocations } = require('../lib/getPermittedLocations')
 const HTTPError = require('../lib/httperror')
+const { logErrorToDB } = require('../lib/common')
 
 module.exports = async function (context, req) {
+  let requestor = undefined;
   try {
     // Prepare the request
     const required = ['params.upn']
-    const { requestor } = await prepareRequest(req, { required })
+    ({ requestor } = await prepareRequest(req, { required }))
 
     // If the user is not admin, make sure that the user has permissing to see the users teams
     if (!requestor.roles.includes('App.Admin')) {
@@ -35,6 +37,7 @@ module.exports = async function (context, req) {
     // Send the response
     return await azfHandleResponse(data, context, req)
   } catch (err) {
+    await logErrorToDB(err, req, requestor)
     return await azfHandleError(err, context, req)
   }
 }

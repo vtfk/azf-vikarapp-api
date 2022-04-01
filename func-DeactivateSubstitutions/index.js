@@ -1,12 +1,13 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
-const { deactivateSubstitutions } = require('../lib/common')
+const { deactivateSubstitutions, logErrorToDB } = require('../lib/common')
 const db = require('../lib/db')
 const { prepareRequest } = require('../lib/_helpers')
 
 module.exports = async function (context, req) {
+  let requestor = undefined;
   try {
     // Prepare the request
-    const { requestor } = await prepareRequest(req, { required: ['body']})
+    ({ requestor } = await prepareRequest(req, { required: ['body']}))
 
     // Make sure that the requestor is admin
     if(!requestor.roles?.includes('App.Config')) throw new Error('You do not have the required permissions to deactivate a substitution');
@@ -30,6 +31,7 @@ module.exports = async function (context, req) {
     // Send the response
     return await azfHandleResponse(response, context, req)
   } catch (err) {
+    await logErrorToDB(err, req, requestor)
     return await azfHandleError(err, context, req)
   }
 }

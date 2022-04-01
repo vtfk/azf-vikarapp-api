@@ -1,14 +1,16 @@
-const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
+const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers');
+const { logErrorToDB } = require('../lib/common');
 const db = require('../lib/db')
 
 const { prepareRequest } = require('../lib/_helpers')
 
 module.exports = async function (context, req) {
+  let requestor = undefined;
   try {
     // Prepare the request
     const required = ['body.name']
 
-    await prepareRequest(req, { required })
+    ({ requestor } = await prepareRequest(req, { required }))
 
     // Connect to dabase
     await db.connect()
@@ -19,6 +21,7 @@ module.exports = async function (context, req) {
     // Send the response
     return await azfHandleResponse(data, context, req)
   } catch (err) {
+    await logErrorToDB(err, req, requestor)
     return await azfHandleError(err, context, req)
   }
 }
