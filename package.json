@@ -20,7 +20,8 @@
   "standard": {
     "ignore": [
       "tests/*",
-      "mocks/*"
+      "mocks/*",
+      "func-Debug/*"
     ]
   },
   "dependencies": {

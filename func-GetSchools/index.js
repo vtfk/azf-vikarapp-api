@@ -1,10 +1,10 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const { prepareRequest } = require('../lib/_helpers')
-const { connect, Schools } = require('../lib/db');
-const { logErrorToDB } = require('../lib/common');
+const { connect, Schools } = require('../lib/db')
+const { logErrorToDB } = require('../lib/common')
 
 module.exports = async function (context, req) {
-  let requestor = undefined;
+  let requestor
   try {
     // Prepare the request
     ({ requestor } = await prepareRequest(req))
@@ -19,7 +19,7 @@ module.exports = async function (context, req) {
     // Return
     return await azfHandleResponse(data, context, req)
   } catch (err) {
-    await logErrorToDB(err, req, requestor);
+    await logErrorToDB(err, req, requestor)
     return await azfHandleError(err, context, req)
   }
 }

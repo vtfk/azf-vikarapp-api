@@ -6,11 +6,11 @@ const HTTPError = require('../lib/httperror')
 const { logErrorToDB } = require('../lib/common')
 
 module.exports = async function (context, req) {
-  let requestor = undefined;
+  let requestor
   try {
     // Prepare the request
     const required = ['params.upn']
-    ({ requestor } = await prepareRequest(req, { required }))
+    ;({ requestor } = await prepareRequest(req, { required }))
 
     // If the user is not admin, make sure that the user has permissing to see the users teams
     if (!requestor.roles.includes('App.Admin')) {

@@ -8,7 +8,7 @@ const HTTPError = require('../lib/httperror')
 const { activateSubstitutions, logErrorToDB } = require('../lib/common')
 
 module.exports = async function (context, req) {
-  let requestor;
+  let requestor
   try {
     // Prepare the request
     ({ requestor } = await prepareRequest(req))
@@ -129,7 +129,7 @@ module.exports = async function (context, req) {
     }
 
     // Make the request to activate the substitutions in the database
-    await activateSubstitutions();
+    await activateSubstitutions()
 
     // Send the response
     return await azfHandleResponse(documents, context, req)

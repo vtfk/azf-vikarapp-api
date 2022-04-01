@@ -1,10 +1,10 @@
-const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers');
-const { logErrorToDB } = require('../lib/common');
+const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
+const { logErrorToDB } = require('../lib/common')
 const db = require('../lib/db')
 const { prepareRequest } = require('../lib/_helpers')
 
 module.exports = async function (context, req) {
-  let requestor;
+  let requestor
   try {
     // Prepare the request
     ({ requestor } = await prepareRequest(req))
