@@ -1,5 +1,5 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
-const { deactivateSubstitutions, logErrorToDB } = require('../lib/common')
+const { deactivateSubstitutions, logToDB } = require('../lib/common')
 const db = require('../lib/db')
 const { prepareRequest } = require('../lib/_helpers')
 
@@ -28,10 +28,13 @@ module.exports = async function (context, req) {
     // Deactivate all expired
     await deactivateSubstitutions(undefined, response)
 
+    // Write the request to the database
+    logToDB('info', 'OK', req, context, requestor)
+
     // Send the response
     return await azfHandleResponse(response, context, req)
   } catch (err) {
-    await logErrorToDB(err, req, requestor)
+    await logToDB('error', err, req, context, requestor)
     return await azfHandleError(err, context, req)
   }
 }

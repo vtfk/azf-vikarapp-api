@@ -1,5 +1,6 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
-const { logErrorToDB } = require('../lib/common')
+const { inspect } = require('@vtfk/utilities/lib/utilities')
+const { logToDB } = require('../lib/common')
 const db = require('../lib/db')
 const HTTPError = require('../lib/httperror')
 
@@ -7,6 +8,8 @@ const { prepareRequest } = require('../lib/_helpers')
 
 module.exports = async function (context, req) {
   let requestor
+
+  inspect(context)
   try {
     // Prepare the request
     ({ requestor } = await prepareRequest(req))
@@ -19,8 +22,8 @@ module.exports = async function (context, req) {
     const substituteUpn = req.query?.substituteUpn
     const teacherUpn = req.query?.teacherUpn
     let years = req.query?.years
-    if(years && years.includes(',')) years = years.split(',');
-    if(years && !Array.isArray(years)) years = [years];
+    if (years && years.includes(',')) years = years.split(',')
+    if (years && !Array.isArray(years)) years = [years]
 
     // If the requestor is not admin, make sure that it has permissions for the call
     if (!requestor.roles.includes('App.Admin')) {
@@ -34,7 +37,7 @@ module.exports = async function (context, req) {
     if (substituteUpn) { filter.push({ substituteUpn: substituteUpn }) }
     if (teacherUpn) { filter.push({ teacherUpn: teacherUpn }) }
     if (years && years.length > 0) {
-      let $or = [];
+      const $or = []
 
       years.forEach((i) => {
         const firstTimestamp = new Date(i, 0, 1, 1)
@@ -46,19 +49,19 @@ module.exports = async function (context, req) {
           }
         })
       })
-      filter.push({ $or: $or });
+      filter.push({ $or: $or })
     }
 
     if (filter.length > 0) filter = { $and: [...filter] }
     else filter = {}
 
     // Make the database request
-    const data = await db.Substitutions.find(filter).sort({ expirationTimestamp: 'desc'})
+    const data = await db.Substitutions.find(filter).sort({ expirationTimestamp: 'desc' })
 
     // Send the response
     return await azfHandleResponse(data, context, req)
   } catch (err) {
-    logErrorToDB(err, req, requestor)
+    logToDB('error', err, req, context, requestor)
     return await azfHandleError(err, context, req)
   }
 }
