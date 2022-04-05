@@ -53,7 +53,7 @@ module.exports = async function (context, req) {
     else filter = {}
 
     // Make the database request
-    const data = await db.Substitutions.find(filter)
+    const data = await db.Substitutions.find(filter).sort({ expirationTimestamp: 'desc'})
 
     // Send the response
     return await azfHandleResponse(data, context, req)
