@@ -4,6 +4,7 @@ const { logToDB } = require('../lib/common')
 const { Logs } = require('../lib/db')
 
 module.exports = async function (context, req) {
+  context.log('Application Insights log test')
   let requestor
   try {
     // Prepare the request
