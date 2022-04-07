@@ -2,6 +2,7 @@ const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const { prepareRequest } = require('../lib/_helpers')
 const { logToDB } = require('../lib/common')
 const { Logs } = require('../lib/db')
+const HTTPError = require('../lib/httperror')
 
 module.exports = async function (context, req) {
   let requestor
@@ -10,6 +11,7 @@ module.exports = async function (context, req) {
     ;({ requestor } = await prepareRequest(req))
     if (process.env.NODE_ENV !== 'development' && !requestor.roles.includes('App.Admin')) throw new HTTPError(401, 'Du har ikke rettigheter til å gjennomføre denne handlingen')
 
+    // Retreive the logs
     const data = await Logs.find({})
 
     // Send the response
