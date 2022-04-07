@@ -1,4 +1,3 @@
-const config = require('../config')
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 const { prepareRequest } = require('../lib/_helpers')
 const { logToDB } = require('../lib/common')
@@ -11,7 +10,7 @@ module.exports = async function (context, req) {
     ;({ requestor } = await prepareRequest(req))
     // if (!requestor.roles.includes('App.Admin')) throw new HTTPError(401, 'Du har ikke rettigheter til å gjennomføre denne handlingen')
 
-    const data = await Logs.find();
+    const data = await Logs.find({})
 
     // Send the response
     return await azfHandleResponse(data, context, req)
