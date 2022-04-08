@@ -129,7 +129,7 @@ module.exports = async function (context, req) {
     }
 
     // Make the request to activate the substitutions in the database
-    await activateSubstitutions()
+    await activateSubstitutions(false, req, context)
 
     // Write the request to the database
     logToDB('info', documents, req, context, requestor)
@@ -137,6 +137,7 @@ module.exports = async function (context, req) {
     // Send the response
     return await azfHandleResponse(documents, context, req)
   } catch (err) {
+    console.log('Error posting substitution', err)
     await logToDB('error', err, req, context, requestor)
     return await azfHandleError(err, context, req)
   }

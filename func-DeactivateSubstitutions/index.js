@@ -26,10 +26,10 @@ module.exports = async function (context, req) {
     const response = await db.Substitutions.find({ _id: { $in: ids } })
 
     // Deactivate all expired
-    await deactivateSubstitutions(undefined, response)
+    const deactivated = await deactivateSubstitutions(undefined, response)
 
     // Write the request to the database
-    logToDB('info', 'OK', req, context, requestor)
+    logToDB('info', deactivated, req, context, requestor)
 
     // Send the response
     return await azfHandleResponse(response, context, req)
