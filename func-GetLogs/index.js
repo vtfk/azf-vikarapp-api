@@ -14,8 +14,16 @@ module.exports = async function (context, req) {
     // Connect to the database
     await connect()
 
+    // Determine the filter
+    let filter = {};
+    if(req.query.from || req.query.to) {
+      filter.startTimestamp = {};
+      if(req.query.from) filter.startTimestamp.$gt = req.query.from;
+      if(req.query.to) filter.startTimestamp.$lt = req.query.to;
+    } 
+
     // Retreive the logs
-    const data = await Logs.find({}).sort({ startTimestamp: 'desc' })
+    const data = await Logs.find(filter).sort({ startTimestamp: 'desc' })
 
     // Send the response
     return await azfHandleResponse(data, context, req)
