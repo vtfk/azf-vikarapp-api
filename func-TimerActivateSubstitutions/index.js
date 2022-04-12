@@ -6,6 +6,7 @@ module.exports = async function (context, myTimer) {
   try {
     await activateSubstitutions(false, undefined, context)
   } catch (err) {
+    context.log('Error activating substitutions', err)
     logToDB('error', err, undefined, context)
   }
 }
