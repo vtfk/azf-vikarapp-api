@@ -102,6 +102,9 @@ module.exports = async function (context, req) {
           expirationTimestamp: expirationTimestamp
         })
       } else {
+        let teamSdsId = team.mail
+        if (teamSdsId.includes('_')) teamSdsId = teamSdsId.substring(teamSdsId.indexOf('_') + 1)
+
         newSubstitutions.push({
           status: 'pending',
           teacherId: teacher.id,
@@ -112,6 +115,8 @@ module.exports = async function (context, req) {
           substituteUpn: substitute.userPrincipalName,
           teamId: team.id,
           teamName: team.displayName,
+          teamEmail: team.mail,
+          teamSdsId: teamSdsId,
           expirationTimestamp: expirationTimestamp
         })
       }

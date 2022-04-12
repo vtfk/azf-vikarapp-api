@@ -23,5 +23,6 @@ module.exports = {
     issuer: `https://sts.windows.net/${process.env.AZURE_APP_TENANT_ID}/`,
     jwkUri: `https://login.microsoftonline.com/${process.env.AZURE_APP_TENANT_ID}/discovery/v2.0/keys`
   },
-  mongoDBConnectionString: process.env.MONGODB_CONNECTIONSTRING
+  mongoDBConnectionString: process.env.MONGODB_CONNECTIONSTRING,
+  SDS_MONGODB_CONNECTIONSTRING: process.env.SDS_MONGODB_CONNECTIONSTRING
 }
