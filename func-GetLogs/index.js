@@ -15,12 +15,12 @@ module.exports = async function (context, req) {
     await connect()
 
     // Determine the filter
-    let filter = {};
-    if(req.query.from || req.query.to) {
-      filter.startTimestamp = {};
-      if(req.query.from) filter.startTimestamp.$gt = req.query.from;
-      if(req.query.to) filter.startTimestamp.$lt = req.query.to;
-    } 
+    const filter = {}
+    if (req.query.from || req.query.to) {
+      filter.startTimestamp = {}
+      if (req.query.from) filter.startTimestamp.$gt = req.query.from
+      if (req.query.to) filter.startTimestamp.$lt = req.query.to
+    }
 
     // Retreive the logs
     const data = await Logs.find(filter).sort({ startTimestamp: 'desc' })
