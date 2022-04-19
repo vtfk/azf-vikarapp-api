@@ -22,17 +22,14 @@ module.exports = async function (context, req) {
     // Connect to dabase
     await db.connect()
 
-    // Update the school
+    // Retreive substitutions from the ids
     const response = await db.Substitutions.find({ _id: { $in: ids } })
 
     // Deactivate all expired
-    const deactivated = await deactivateSubstitutions(undefined, response)
-
-    // Write the request to the database
-    logToDB('info', deactivated, req, context, requestor)
+    const deactivated = await deactivateSubstitutions(undefined, response, req, context)
 
     // Send the response
-    return await azfHandleResponse(response, context, req)
+    return await azfHandleResponse(deactivated, context, req)
   } catch (err) {
     await logToDB('error', err, req, context, requestor)
     return await azfHandleError(err, context, req)
