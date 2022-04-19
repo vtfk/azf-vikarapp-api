@@ -47,6 +47,7 @@ VikarApp makes it simple for teachers to substitute for other teachers school te
     * Add all teachers to this group
 1. Deploy the API
     * Create an Azure Function App for running the API
+    * The Azure Function App should be created with Application Insights and a StorageAccouns
     * Deploy this GitHub repository to that Azure Function App
 1. Deploy the WebApp
     * See the [GitHub repository](https://github.com/vtfk/vikarapp-web) for deployment information
