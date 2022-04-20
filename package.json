@@ -14,7 +14,7 @@
     "cross-env": "^7.0.3",
     "jest": "^27.5.1",
     "msw": "^0.36.8",
-    "standard": "^16.0.4",
+    "standard": "17.0.0",
     "stub-azure-function-context": "^2.0.0-alpha.6"
   },
   "standard": {
