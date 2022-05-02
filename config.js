@@ -24,5 +24,9 @@ module.exports = {
     jwkUri: `https://login.microsoftonline.com/${process.env.AZURE_APP_TENANT_ID}/discovery/v2.0/keys`
   },
   mongoDBConnectionString: process.env.MONGODB_CONNECTIONSTRING,
-  SDS_MONGODB_CONNECTIONSTRING: process.env.SDS_MONGODB_CONNECTIONSTRING
+  SDS_MONGODB_CONNECTIONSTRING: process.env.SDS_MONGODB_CONNECTIONSTRING,
+  E18_URL: process.env.E18_URL,
+  E18_KEY: process.env.E18_KEY,
+  E18_SYSTEM: process.env.E18_SYSTEM,
+  E18_PROJECTID: process.env.E18_PROJECTID
 }

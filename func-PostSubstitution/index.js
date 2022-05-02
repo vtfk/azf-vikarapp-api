@@ -26,6 +26,7 @@ module.exports = async function (context, req) {
       if (!substitution.teacherUpn) throw new Error('En eller flere vikariatforespørsler mangler \'teacherUpn\'')
       if (!substitution.teacherUpn.includes('@')) throw new Error(`${substitution.teacherUpn} er ikke ett gyldig upn`)
       if (!substitution.teamId) throw new Error('En eller flere vikariatforespørsler mangler \'teamId\'')
+      if (substitution.substituteUpn.toLowerCase() === substitution.teacherUpn.toLowerCase()) throw new Error(`Vikar '${substitution.substituteUpn}' kan ikke være vikar for seg selv`)
     }
 
     // Connect the database

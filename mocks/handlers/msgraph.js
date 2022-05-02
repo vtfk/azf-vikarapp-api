@@ -60,6 +60,12 @@ const handlers = [
     return res(
       ctx.json()
     )
+  }),
+  rest.delete('https://graph.microsoft.com/v1.0/groups/:groupId/members/:userId/$ref', (req, res, ctx) => {
+    // Just return that it went fine  
+    return res(
+      ctx.json()
+    )
   })
 ]
 
