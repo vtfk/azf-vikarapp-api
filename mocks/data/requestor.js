@@ -9,6 +9,7 @@ export default {
   jobTitle: 'Rådgiver',
   department: 'Teknologi og digitalisering',
   officeLocation: 'Fylkeshuset i Tønsberg',
+  company: 'Brukerbehov, digitalisering og kommunikasjon',
   roles: [ 'App.User', 'App.Config' ],
   scopes: [ 'User.Read', 'User.ReadBasic.All' ]
 }

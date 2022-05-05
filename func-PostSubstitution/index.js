@@ -49,7 +49,7 @@ module.exports = async function (context, req) {
 
       // If the requestor is not admin, get the substitutes permittedLocations
       if (!requestor.roles.includes('App.Admin')) {
-        substitute.permittedLocations = await getPermittedLocations(substitute.officeLocation)
+        substitute.permittedLocations = await getPermittedLocations(substitute.company)
         if (!substitute.permittedLocations || !Array.isArray(substitute.permittedLocations) || substitute.permittedLocations.length === 0) throw new Error(`Vikar '${upn}' har ikke rettigheter til å vikariere for noen`)
       }
 
@@ -85,7 +85,7 @@ module.exports = async function (context, req) {
       if (!requestor.roles.includes('App.Admin')) {
         if (!Array.isArray(substitute.permittedLocations) || substitute.permittedLocations.length === 0) throw new HTTPError(400, `Klarer ikke å finne ut om vikar har rettigheter til å vikariere for lærer '${teacher.userPrincipalName}'`)
         const permittedNames = substitute.permittedLocations.map((i) => i.name)
-        if (!permittedNames.includes(teacher.officeLocation)) throw new HTTPError(401, `Vikar '${substitute.userPrincipalName}' har ikke rettigheter til å vikariere for '${teacher.userPrincipalName}'`)
+        if (!permittedNames.includes(teacher.company)) throw new HTTPError(401, `Vikar '${substitute.userPrincipalName}' har ikke rettigheter til å vikariere for '${teacher.userPrincipalName}'`)
       }
 
       // Verify that the teacher owns the requested team and that it is valid for substitution
@@ -126,10 +126,12 @@ module.exports = async function (context, req) {
     // Make requests to the database
     let documents = [] // The documents that will be returned
     if (newSubstitutions.length > 0) {
+      console.log('New substitutions', newSubstitutions)
       const result = await db.Substitutions.create(newSubstitutions)
       documents = [...result]
     }
     for (const renewal of renewedSubstitutions) {
+      console.log('Renew substitutions', renewedSubstitutions)
       const result = await db.Substitutions.findByIdAndUpdate(renewal._id, renewal, { new: true })
       documents = [...documents, result]
     }

@@ -36,7 +36,7 @@ VikarApp makes it simple for teachers to substitute for other teachers school te
         *  https://[your-url]/handlelogin
     1. Generate a Client Secret and keep it somewhere safe
     1. Add the following custom claims
-        * officeLocation
+        * company
         * department
         * [Guide for doing this](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-claims-mapping#include-the-employeeid-and-tenantcountry-as-claims-in-tokens)
 1. Create a MongoDB database with a user with read/write access
@@ -54,7 +54,7 @@ VikarApp makes it simple for teachers to substitute for other teachers school te
 
 ### (Optional)
 1. If wou want to limit what schools can search for each other
-    * Make sure that the officeLocation attribute is set appropriatly for all teachers
+    * Make sure that the company attribute is set appropriatly for all teachers
 1. If you want to check if the substitute has become a teacher for the team after substituting and should not be removed (Works only for Visma in-school)
     1. Create a MongoDB database for the SDS (School data sync) information
     2. Create a script that regularly dumps the SDS data to the database

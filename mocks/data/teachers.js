@@ -6,7 +6,7 @@ module.exports = [
     "id": nanoid(),
     "displayName": "School #1 Teacher #1",
     "jobTitle": "Tester",
-    "officeLocation": "School #1",
+    "company": "School #1",
     "userPrincipalName": "s1t1@vtfk.no",
     owned: [
       '5bf3266e-9ba0-4524-8887-ea6547377b54',
@@ -20,7 +20,7 @@ module.exports = [
     "id": nanoid(),
     "displayName": "School #1 Teacher #2",
     "jobTitle": "Tester",
-    "officeLocation": "School #1",
+    "company": "School #1",
     "userPrincipalName": "s1t2@vtfk.no",
     owned: [
     '5735b78c-2f25-40a8-89e2-29c587b1032c'
@@ -31,7 +31,7 @@ module.exports = [
     "id": nanoid(),
     "displayName": "School #2 Teacher #1",
     "jobTitle": "Tester",
-    "officeLocation": "School #2",
+    "company": "School #2",
     "userPrincipalName": "s2t1@vtfk.no",
     owned: [
       '4d6d602e-2ab3-44e6-a75f-7fd24707c845'
@@ -42,7 +42,7 @@ module.exports = [
     "id": nanoid(),
     "displayName": "School #2 Teacher #2",
     "jobTitle": "Tester",
-    "officeLocation": "School #2",
+    "company": "School #2",
     "userPrincipalName": "s2t2@vtfk.no",
     owned: [
       '8df65c9e-a0a4-4599-872c-2d3ba654556b'
@@ -53,7 +53,7 @@ module.exports = [
     "id": nanoid(),
     "displayName": "School #3 Teacher #1",
     "jobTitle": "Tester",
-    "officeLocation": "School #3",
+    "company": "School #3",
     "userPrincipalName": "s3t1@vtfk.no",
     owned: [
       'a1eaa827-c6f9-458f-94f4-40ff64f7dca1'
@@ -64,7 +64,7 @@ module.exports = [
     "id": nanoid(),
     "displayName": "School #3 Teacher #2",
     "jobTitle": "Tester",
-    "officeLocation": "School #3",
+    "company": "School #3",
     "userPrincipalName": "s3t2@vtfk.no",
     owned: [
       'a1eaa827-c6f9-458f-94f4-40ff64f7dca1'

@@ -50,7 +50,7 @@ const request = {
     familyName: 'Testesen',
     jobTitle: 'Tester',
     department: 'Test avdelingen',
-    officeLocation: 'School #1',
+    company: 'School #1',
     roles: ['App.Admin', 'App.Config'],
     scopes: ['123']
   }
@@ -119,7 +119,7 @@ describe('Teachers', () => {
       ...request,
       params: { searchTerm: 'test' },
     }
-    req.requestor.officeLocation = 'School #1'
+    req.requestor.company = 'School #1'
     req.requestor.roles = ['']
 
     const response = await getTeachers(null, req);
@@ -135,7 +135,7 @@ describe('Teachers', () => {
       params: { searchTerm: 'test' }
     }
     req.requestor.upn = 's2t1@vtfk.no'
-    req.requestor.officeLocation = 'School #2'
+    req.requestor.company = 'School #2'
     req.requestor.roles = ['']
 
     const response = await getTeachers(null, req);
@@ -151,7 +151,7 @@ describe('Teachers', () => {
       params: { searchTerm: 'test' }
     }
     req.requestor.upn = 's3t1@vtfk.no'
-    req.requestor.officeLocation = 'School #3'
+    req.requestor.company = 'School #3'
     req.requestor.roles = ['']
 
     const response = await getTeachers(null, req);
@@ -168,7 +168,7 @@ describe('Teachers', () => {
     }
     req.requestor.upn = 's3t1@vtfk.no'
     req.requestor.roles = ['App.Admin'];
-    req.requestor.officeLocation = 'School #3'
+    req.requestor.company = 'School #3'
 
     const response = await getTeachers(null, req);
     expect(response.status).toBe(200);
@@ -184,7 +184,7 @@ describe('Teachers', () => {
     }
     req.requestor.upn = 's3t1@vtfk.no'
     req.requestor.roles = [];
-    req.requestor.officeLocation = 'School #3'
+    req.requestor.company = 'School #3'
 
     const response = await getTeachers(null, req);
     expect(response.status).toBe(200);
@@ -200,7 +200,7 @@ describe('TeacherTeams', () => {
       params: { upn: 's1t2@vtfk.no' },
     }
     req.requestor.upn = 's1t1@vtfk.no';
-    req.requestor.officeLocation = 'School #1';
+    req.requestor.company = 'School #1';
 
     const response = await getTeacherTeams(null, req);
     expect(response.status).toBe(200);
@@ -214,7 +214,7 @@ describe('TeacherTeams', () => {
       params: { upn: 's1t1@vtfk.no' },
     }
     req.requestor.upn = 's2t1@vtfk.no';
-    req.requestor.officeLocation = 'School #2';
+    req.requestor.company = 'School #2';
 
     const response = await getTeacherTeams(null, req);
     expect(response.status).toBe(200);
@@ -229,7 +229,7 @@ describe('TeacherTeams', () => {
       params: { upn: 's1t1@vtfk.no' },
     }
     req.requestor.upn = 's3t1@vtfk.no';
-    req.requestor.officeLocation = 'School #3';
+    req.requestor.company = 'School #3';
 
     const response = await getTeacherTeams(null, req);
     expect(response.status).toBe(401);
@@ -242,7 +242,7 @@ describe('TeacherTeams', () => {
       params: { upn: 's1t1@vtfk.no' },
     }
     req.requestor.upn = 's1t1@vtfk.no';
-    req.requestor.officeLocation = 'School #1';
+    req.requestor.company = 'School #1';
 
     const response = await getTeacherTeams(null, req);
     expect(response.status).toBe(200);
@@ -261,7 +261,7 @@ describe('Substitutions', () => {
     const upn = 's1t2@vtfk.no';
     let req = { ...request, params: { upn: upn }}
     req.requestor.upn = 's1t1@vtfk.no';
-    req.requestor.officeLocation = 'School #1'
+    req.requestor.company = 'School #1'
     // Retreive the teachers teams
     const teams = await getTeacherTeams(null, req);
     // Prepare the substitute request
@@ -303,7 +303,7 @@ describe('Substitutions', () => {
       }
     }
     req.requestor.upn = 's1t1@vtfk.no';
-    req.requestor.officeLocation = 'School #1'
+    req.requestor.company = 'School #1'
     const response = await GetSubstitutions(null, req);
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(tt2TeamCount);
@@ -314,7 +314,7 @@ describe('Substitutions', () => {
   test(`Teacher in 's2t1@vtfk.no' in 'School #2' should be able to substitute from 's1t1@vtfk.no`, async () => {
     let req = { ...request, params: { upn: 's1t1@vtfk.no' }}
     req.requestor.upn = 's2t1@vtfk.no';
-    req.requestor.officeLocation = 'School #2'
+    req.requestor.company = 'School #2'
     const tt1Response = await getTeacherTeams(null, req);
 
     tt1TeamCount = tt1Response.body.length;
@@ -340,7 +340,7 @@ describe('Substitutions', () => {
       outputError: false
     }
     req.requestor.upn = 's3t1@vtfk.no';
-    req.requestor.officeLocation = 'School #3'
+    req.requestor.company = 'School #3'
     req.requestor.roles = [''];
 
     req.body = tt1Teams.map((i) => { 
@@ -362,7 +362,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t2@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['App.Admin']
       }
     }
@@ -386,7 +386,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t2@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['App.Admin']
       }
     }
@@ -405,7 +405,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t2@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['App.Admin']
       }
     }
@@ -425,7 +425,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t2@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['App.Admin']
       }
     }
@@ -443,7 +443,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t1@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['']
       }
     }
@@ -463,7 +463,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t1@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['']
       }
     }
@@ -483,7 +483,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t1@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['']
       }
     }
@@ -503,7 +503,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's3t1@vtfk.no',
-        officeLocation: 'School #3',
+        company: 'School #3',
         roles: ['']
       }
     }
@@ -522,7 +522,7 @@ describe('Substitutions', () => {
       requestor: {
         ...request.requestor,
         upn: 's1t2@vtfk.no',
-        officeLocation: 'School #1',
+        company: 'School #1',
         roles: ['']
       }
     }

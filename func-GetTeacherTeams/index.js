@@ -19,11 +19,11 @@ module.exports = async function (context, req) {
       if (!user) throw new Error(`Kunne ikke finne en bruker med upn '${req.params.upn}'`)
 
       // Get the requestors permitted locations
-      const permittedLocations = await getPermittedLocations(requestor.officeLocation)
+      const permittedLocations = await getPermittedLocations(requestor.company)
       const permittedNames = permittedLocations.map((i) => i.name)
 
       // Throw if the user is not in the permitted locations
-      if (!permittedNames.includes(user.officeLocation)) throw new HTTPError(401, `Du har ikke lov til å se teams for lokasjon '${user.officeLocation}'`, 'Manglende rettigheter')
+      if (!permittedNames.includes(user.company)) throw new HTTPError(401, `Du har ikke lov til å se teams for lokasjon '${user.company}'`, 'Manglende rettigheter')
     }
 
     // Retreive the owned objects

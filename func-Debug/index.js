@@ -33,6 +33,8 @@ module.exports = async function (context, req) {
 
     let result = await deactivateSubstitutions(false, undefined, req, context);
 
+    // throw new Error('vikarapi-test')
+
     // Send the response
     return await azfHandleResponse(result, context, req)
   } catch (err) {
