@@ -30,7 +30,7 @@ module.exports = async function (context, req) {
       else {
         // Filter out users that are not part of the permitted locations
         const permittedLocationNames = permittedLocations.map((i) => i.name)
-        data = data.filter((i) => permittedLocationNames.includes(i.company))
+        data = data.filter((i) => permittedLocationNames.includes(i.companyName))
       }
     }
 

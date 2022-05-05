@@ -23,7 +23,7 @@ module.exports = async function (context, req) {
       const permittedNames = permittedLocations.map((i) => i.name)
 
       // Throw if the user is not in the permitted locations
-      if (!permittedNames.includes(user.company)) throw new HTTPError(401, `Du har ikke lov til å se teams for lokasjon '${user.company}'`, 'Manglende rettigheter')
+      if (!permittedNames.includes(user.companyName)) throw new HTTPError(401, `Du har ikke lov til å se teams for lokasjon '${user.companyName}'`, 'Manglende rettigheter')
     }
 
     // Retreive the owned objects
