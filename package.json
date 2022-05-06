@@ -27,7 +27,7 @@
   "dependencies": {
     "@azure/identity": "2.0.4",
     "@vtfk/e18": "^2.1.5",
-    "@vtfk/responsehandlers": "^1.0.23",
+    "@vtfk/responsehandlers": "1.0.24",
     "@vtfk/utilities": "^1.4.0",
     "axios": "0.26.1",
     "azure-ad-verify-token": "^1.1.2",
