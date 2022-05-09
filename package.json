@@ -27,7 +27,7 @@
   "dependencies": {
     "@azure/identity": "2.0.4",
     "@vtfk/e18": "^2.1.5",
-    "@vtfk/responsehandlers": "^1.0.23",
+    "@vtfk/responsehandlers": "1.0.24",
     "@vtfk/utilities": "^1.4.0",
     "axios": "0.26.1",
     "azure-ad-verify-token": "^1.1.2",
@@ -36,7 +36,7 @@
     "mongodb": "^4.5.0",
     "mongodb-memory-server": "^8.5.2",
     "mongoose": "6.2.11",
-    "nanoid": "3.3.3",
+    "nanoid": "3.3.4",
     "node-cache": "^5.1.2",
     "qs": "^6.10.3"
   }
