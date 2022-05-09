@@ -1,6 +1,6 @@
 const { azfHandleResponse, azfHandleError } = require('@vtfk/responsehandlers')
 
-const { getGroupMembers, getGroupOwners, addGroupOwner, removeGroupOwner, getOwnedObjects } = require('../lib/msgraph')
+const { getGroupMembers, getGroupOwners, addGroupOwner, removeGroupOwner, getOwnedObjects, getUser } = require('../lib/msgraph')
 
 const { client, connect, getSDSEntry } = require('../lib/sds')
 const { connect:connectDB, Substitutions } = require('../lib/db')
@@ -31,9 +31,11 @@ module.exports = async function (context, req) {
     // const owned = await getOwnedObjects('gry.heum.thorsen@vtfk.no');
     // const entry = await r.findOne({userPrincipalName: 'gry.heum.thorsen@vtfk.no'})
 
-    let result = await deactivateSubstitutions(false, undefined, req, context);
+    // let result = await deactivateSubstitutions(false, undefined, req, context);
 
     // throw new Error('vikarapi-test')
+
+    const result = await getUser('cecilie.skaane@vtfk.no')
 
     // Send the response
     return await azfHandleResponse(result, context, req)

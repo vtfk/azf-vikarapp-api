@@ -17,6 +17,7 @@ module.exports = async function (context, req) {
       // Get the user to get teams from
       const user = await getUser(req.params.upn)
       if (!user) throw new Error(`Kunne ikke finne en bruker med upn '${req.params.upn}'`)
+      if (!user.companyName) throw new HTTPError(401, `Klarte ikke å finne hvilken skole '${req.params.upn}' tilhører`, 'Rettigheter kan mangle')
 
       // Get the requestors permitted locations
       const permittedLocations = await getPermittedLocations(requestor.company)
