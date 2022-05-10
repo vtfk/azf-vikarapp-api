@@ -8,6 +8,7 @@ const { deactivateSubstitutions } = require('../lib/common')
 
 module.exports = async function (context, req) {
   try {
+    if(process.env.NODE_ENV === 'production') throw new Error('This endpoint is not active in production')
     // Prepare the request
     // await prepareRequest(req)
 
@@ -34,8 +35,6 @@ module.exports = async function (context, req) {
     // let result = await deactivateSubstitutions(false, undefined, req, context);
 
     // throw new Error('vikarapi-test')
-
-    const result = await getUser('cecilie.skaane@vtfk.no')
 
     // Send the response
     return await azfHandleResponse(result, context, req)
