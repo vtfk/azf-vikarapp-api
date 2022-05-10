@@ -14,7 +14,7 @@ jobs:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v2
     - name: Setup Node ${{ env.NODE_VERSION }} Environment
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ env.NODE_VERSION }}
     - name: 'Resolve Project Dependencies Using Npm'
