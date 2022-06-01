@@ -10,7 +10,7 @@
   "author": "",
   "devDependencies": {
     "@azure/identity-vscode": "^1.0.0",
-    "@types/jest": "27.4.1",
+    "@types/jest": "27.5.2",
     "cross-env": "^7.0.3",
     "jest": "^27.5.1",
     "msw": "^0.36.8",
