@@ -10,9 +10,9 @@
   "author": "",
   "devDependencies": {
     "@azure/identity-vscode": "^1.0.0",
-    "@types/jest": "27.4.1",
+    "@types/jest": "28.1.1",
     "cross-env": "^7.0.3",
-    "jest": "^27.5.1",
+    "jest": "28.1.0",
     "msw": "^0.36.8",
     "standard": "^16.0.4",
     "stub-azure-function-context": "^2.0.0-alpha.6"
