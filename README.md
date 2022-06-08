@@ -15,6 +15,7 @@ VikarApp makes it simple for teachers to substitute for other teachers school te
 1. Microsoft Azure Subscription
 1. Microsoft Office 365 Tenant with teams
 1. [Microsoft School Data Sync](https://sds.microsoft.com/)
+1. MongoDB database
 1. (Optional) Visma InSchool
 ### Steps
 1. Create a App registration in Azure AD
