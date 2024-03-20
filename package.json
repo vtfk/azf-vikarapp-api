@@ -29,7 +29,7 @@
     "@vtfk/e18": "^2.1.5",
     "@vtfk/responsehandlers": "1.0.25",
     "@vtfk/utilities": "^1.4.0",
-    "axios": "0.26.1",
+    "axios": "0.28.0",
     "azure-ad-verify-token": "^1.1.2",
     "dotenv": "16.0.1",
     "lodash.get": "^4.4.2",
